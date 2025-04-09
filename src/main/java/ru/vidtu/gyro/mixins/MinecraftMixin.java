@@ -31,7 +31,10 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -46,6 +49,12 @@ import ru.vidtu.gyro.Gyro;
 @Mixin(Minecraft.class)
 @NullMarked
 public final class MinecraftMixin {
+    /**
+     * Logger for this class.
+     */
+    @Unique
+    private static final Logger GYRO_LOGGER = LoggerFactory.getLogger("Gyro/MinecraftMixin");
+
     /**
      * An instance of this class cannot be created.
      *
@@ -66,7 +75,20 @@ public final class MinecraftMixin {
      */
     @Inject(method = "updateLevelInEngines", at = @At("RETURN"))
     private void gyro_updateLevelInEngines_return(@Nullable ClientLevel level, CallbackInfo ci) {
+        // Validate.
+        assert ci != null : "Gyro: Parameter 'ci' is null. (level: " + level + ", game: " + this + ')';
+
+        // Log. (**TRACE**)
+        if (GYRO_LOGGER.isTraceEnabled()) {
+            GYRO_LOGGER.trace("Gyro: Clearing data... (level: {}, ci: {}, game: {})", level, ci, this);
+        }
+
+        // Clear.
         Gyro.ANGLES.clear();
         Gyro.RENDER_POSES.clear();
+
+        // Log. (**DEBUG**)
+        if (!GYRO_LOGGER.isDebugEnabled()) return;
+        GYRO_LOGGER.debug("Gyro: Data has been cleared. (level: {}, ci: {}, game: {})", level, ci, this);
     }
 }

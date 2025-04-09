@@ -27,6 +27,7 @@
 package ru.vidtu.gyro;
 
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
 import ru.vidtu.gyro.mixins.LevelRendererMixin;
 
@@ -41,4 +42,13 @@ import ru.vidtu.gyro.mixins.LevelRendererMixin;
 @ApiStatus.Internal
 @NullMarked
 public record GyroRender(double x, double z, int color) {
+    @Contract(pure = true)
+    @Override
+    public String toString() {
+        return "Gyro/GyroRender{" +
+                "x=" + this.x +
+                ", z=" + this.z +
+                ", color=" + this.color +
+                '}';
+    }
 }

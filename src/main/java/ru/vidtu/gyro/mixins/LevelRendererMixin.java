@@ -39,6 +39,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -76,6 +77,7 @@ public class LevelRendererMixin {
      * @see BeaconRenderer#renderBeaconBeam(PoseStack, MultiBufferSource, ResourceLocation, float, float, long, int, int, int, float, float)
      */
     @Shadow
+    @Nullable
     private ClientLevel level;
 
     /**
@@ -104,6 +106,14 @@ public class LevelRendererMixin {
     private void gyro_renderBlockEntities_return(PoseStack pose, MultiBufferSource.BufferSource source,
                                                  MultiBufferSource.BufferSource blockBreakAnimSource,
                                                  Camera camera, float tickDelta, CallbackInfo ci) {
+        // Validate.
+        assert pose != null : "Gyro: Parameter 'pose' is null. (source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", tickDelta: " + tickDelta + ", ci: " + ci + ", renderer: " + this + ')';
+        assert source != null : "Gyro: Parameter 'source' is null. (pose: " + pose + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", tickDelta: " + tickDelta + ", ci: " + ci + ", renderer: " + this + ')';
+        assert blockBreakAnimSource != null : "Gyro: Parameter 'blockBreakAnimSource' is null. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", tickDelta: " + tickDelta + ", ci: " + ci + ", renderer: " + this + ')';
+        assert camera != null : "Gyro: Parameter 'camera' is null. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", tickDelta: " + tickDelta + ", ci: " + ci + ", renderer: " + this + ')';
+        assert (tickDelta >= 0.0F) && (tickDelta <= 1.0F) : "Gyro: Parameter 'tickDelta' is not in the [0..1] range. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", tickDelta: " + tickDelta + ", ci: " + ci + ", renderer: " + this + ')';
+        assert ci != null : "Gyro: Parameter 'ci' is null. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", tickDelta: " + tickDelta + ", renderer: " + this + ')';
+
         // Get the poses to render, skip if none.
         Collection<GyroRender> poses = Gyro.RENDER_POSES.values();
         if (poses.isEmpty()) return;
@@ -114,18 +124,18 @@ public class LevelRendererMixin {
 
         // Get the camera position and offset by it.
         Vec3 cam = camera.getPosition();
-        double camX = cam.x();
-        double camZ = cam.z();
         pose.pushPose();
-        pose.translate(-camX, 0.0D, -camZ);
+        pose.translate(-cam.x(), 0.0D, -cam.z());
+
+        // Extract the level.
+        ClientLevel level = this.level;
+        assert level != null : "Gyro: Rendering block entities without a client level. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", tickDelta: " + tickDelta + ", ci: " + ci + ", renderer: " + this + ')';
 
         // Render each pos as a beam.
         for (GyroRender pos : poses) {
-            double x = pos.x();
-            double z = pos.z();
             pose.pushPose();
-            pose.translate(x, 0.0D, z);
-            BeaconRenderer.renderBeaconBeam(pose, source, GYRO_BEACON_BEAM, tickDelta, /*scale=*/1.0F, this.level.getGameTime(), /*verticalOffset=*/-1024, /*beamHeight=*/2048, pos.color(), /*solidSize=*/0.15F, /*transparentSize=*/0.175F);
+            pose.translate(pos.x(), 0.0D, pos.z());
+            BeaconRenderer.renderBeaconBeam(pose, source, GYRO_BEACON_BEAM, tickDelta, /*scale=*/1.0F, level.getGameTime(), /*verticalOffset=*/-1024, /*beamHeight=*/2048, pos.color(), /*solidSize=*/0.15F, /*transparentSize=*/0.175F);
             pose.popPose();
         }
 

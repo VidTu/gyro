@@ -61,7 +61,7 @@ public final class Gyro implements ClientModInitializer {
     /**
      * Logger for this class.
      */
-    private static final Logger LOGGER = LoggerFactory.getLogger(Gyro.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger("Gyro");
 
     /**
      * Creates a new mod.
@@ -77,5 +77,11 @@ public final class Gyro implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         LOGGER.info("Gyro: Hi!");
+    }
+
+    @Contract(pure = true)
+    @Override
+    public String toString() {
+        return "Gyro{}";
     }
 }
