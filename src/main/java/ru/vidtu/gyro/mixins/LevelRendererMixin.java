@@ -26,9 +26,11 @@
 
 package ru.vidtu.gyro.mixins;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.FogParameters;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BeaconRenderer;
@@ -106,6 +108,10 @@ public class LevelRendererMixin {
         Collection<GyroRender> poses = Gyro.RENDER_POSES.values();
         if (poses.isEmpty()) return;
 
+        // Disable the fog temporarily.
+        FogParameters fog = RenderSystem.getShaderFog();
+        RenderSystem.setShaderFog(FogParameters.NO_FOG);
+
         // Get the camera position and offset by it.
         Vec3 cam = camera.getPosition();
         double camX = cam.x();
@@ -125,5 +131,8 @@ public class LevelRendererMixin {
 
         // Pop the stack from camera offsetting.
         pose.popPose();
+
+        // Re-enable the fog.
+        RenderSystem.setShaderFog(fog);
     }
 }
