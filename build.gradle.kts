@@ -75,6 +75,11 @@ loom {
     }
 }
 
+repositories {
+    mavenCentral()
+    maven("https://maven.fabricmc.net/") // Fabric.
+}
+
 dependencies {
     // Annotations
     compileOnly(libs.jspecify)
