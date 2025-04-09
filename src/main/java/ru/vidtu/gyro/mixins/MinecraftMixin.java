@@ -28,7 +28,6 @@ package ru.vidtu.gyro.mixins;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
@@ -66,7 +65,7 @@ public final class MinecraftMixin {
      * @param ci    Callback data, ignored
      */
     @Inject(method = "updateLevelInEngines", at = @At("RETURN"))
-    public void gyro_updateLevelInEngines_return(@Nullable ClientLevel level, CallbackInfo ci) {
+    private void gyro_updateLevelInEngines_return(@Nullable ClientLevel level, CallbackInfo ci) {
         Gyro.ANGLES.clear();
         Gyro.RENDER_POSES.clear();
     }

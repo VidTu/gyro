@@ -29,6 +29,7 @@ package ru.vidtu.gyro;
 import com.mojang.datafixers.util.Either;
 import net.fabricmc.api.ClientModInitializer;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +62,14 @@ public final class Gyro implements ClientModInitializer {
      * Logger for this class.
      */
     private static final Logger LOGGER = LoggerFactory.getLogger(Gyro.class);
+
+    /**
+     * Creates a new mod.
+     */
+    @Contract(pure = true)
+    public Gyro() {
+        // Empty
+    }
 
     /**
      * Initializes the client. Logs the message.

@@ -91,17 +91,17 @@ public class LevelRendererMixin {
     /**
      * Handles the block entity rendering.
      *
-     * @param pose                       The current pose stack
-     * @param source                     Buffer rendering source
-     * @param blockBreakingOverlaySource Buffer rendering source for rendering the block breaking overlay, ignored
-     * @param camera                     Current camera data
-     * @param tickDelta                  Current tick data
-     * @param ci                         Callback data, ignored
+     * @param pose                 The current pose stack
+     * @param source               Buffer rendering source
+     * @param blockBreakAnimSource Buffer rendering source for rendering the block breaking overlay, ignored
+     * @param camera               Current camera data
+     * @param tickDelta            Current tick data
+     * @param ci                   Callback data, ignored
      */
     @Inject(method = "renderBlockEntities", at = @At("RETURN"))
-    public void gyro_renderBlockEntities_return(PoseStack pose, MultiBufferSource.BufferSource source,
-                                                MultiBufferSource.BufferSource blockBreakingOverlaySource,
-                                                Camera camera, float tickDelta, CallbackInfo ci) {
+    private void gyro_renderBlockEntities_return(PoseStack pose, MultiBufferSource.BufferSource source,
+                                                 MultiBufferSource.BufferSource blockBreakAnimSource,
+                                                 Camera camera, float tickDelta, CallbackInfo ci) {
         // Get the poses to render, skip if none.
         Collection<GyroRender> poses = Gyro.RENDER_POSES.values();
         if (poses.isEmpty()) return;
@@ -111,14 +111,14 @@ public class LevelRendererMixin {
         double camX = cam.x();
         double camZ = cam.z();
         pose.pushPose();
-        pose.translate(-camX, 0, -camZ);
+        pose.translate(-camX, 0.0D, -camZ);
 
         // Render each pos as a beam.
         for (GyroRender pos : poses) {
             double x = pos.x();
             double z = pos.z();
             pose.pushPose();
-            pose.translate(x, 0, z);
+            pose.translate(x, 0.0D, z);
             BeaconRenderer.renderBeaconBeam(pose, source, GYRO_BEACON_BEAM, tickDelta, /*scale=*/1.0F, this.level.getGameTime(), /*verticalOffset=*/-1024, /*beamHeight=*/2048, pos.color(), /*solidSize=*/0.15F, /*transparentSize=*/0.175F);
             pose.popPose();
         }

@@ -25,16 +25,16 @@
  */
 
 pluginManagement {
-	repositories {
-		gradlePluginPortal()
-		maven("https://maven.fabricmc.net/") // Architectury Loom. (Fabric dependencies)
-		maven("https://maven.architectury.dev/") // Architectury Loom.
-		maven("https://maven.minecraftforge.net/") // Architectury Loom. (Forge dependencies)
-	}
+    repositories {
+        gradlePluginPortal()
+        maven("https://maven.fabricmc.net/") // Architectury Loom. (Fabric dependencies)
+        maven("https://maven.architectury.dev/") // Architectury Loom.
+        maven("https://maven.minecraftforge.net/") // Architectury Loom. (Forge dependencies)
+    }
 }
 
 plugins {
-	id("org.gradle.toolchains.foojay-resolver-convention") version "0.9.0"
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.9.0"
 }
 
 rootProject.name = "gyro"

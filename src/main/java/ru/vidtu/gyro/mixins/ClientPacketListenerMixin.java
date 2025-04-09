@@ -26,7 +26,6 @@
 
 package ru.vidtu.gyro.mixins;
 
-import com.mojang.authlib.GameProfile;
 import com.mojang.datafixers.util.Either;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Gui;
@@ -82,9 +81,10 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
      * @throws AssertionError Always
      * @deprecated Always throws
      */
+    @SuppressWarnings("DataFlowIssue") // <- Inaccessible constructor.
     @Deprecated(forRemoval = true)
     @Contract(value = "-> fail", pure = true)
-    public ClientPacketListenerMixin() {
+    private ClientPacketListenerMixin() {
         super(null, null, null);
         throw new AssertionError("No instances.");
     }
@@ -96,7 +96,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
      * @param ci     Callback data
      */
     @Inject(method = "handleWaypoint", at = @At("RETURN"))
-    public void gyro_handleWaypoint_return(ClientboundTrackedWaypointPacket packet, CallbackInfo ci) {
+    private void gyro_handleWaypoint_return(ClientboundTrackedWaypointPacket packet, CallbackInfo ci) {
         // Schedule it on the minecraft thread to avoid threading issues. Don't use ensureRunningOnSameThread to avoid compat issues.
         this.minecraft.execute(() -> {
             // Extract the data.
@@ -112,7 +112,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 
                     // Extract the position and send the message.
                     Vec3i vector = ((Vec3iWaypointAccessor) vec).gyro_vector();
-                    gyro_updateTrackedPosition(way, vector.getX() + 0.5D, vector.getZ() + 0.5D, "vec3i");
+                    this.gyro_updateTrackedPosition(way, vector.getX() + 0.5D, vector.getZ() + 0.5D, "vec3i");
                 }
 
                 // Chunk waypoint contain the chunk middle position. We'll use the chunk center, no better alternative.
@@ -122,7 +122,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 
                     // Extract the position and send the message.
                     ChunkPos pos = ((ChunkWaypointAccessor) chunk).gyro_chunkPos();
-                    gyro_updateTrackedPosition(way, pos.getMiddleBlockX() + 0.5D, pos.getMiddleBlockZ() + 0.5D, "chunk");
+                    this.gyro_updateTrackedPosition(way, pos.getMiddleBlockX() + 0.5D, pos.getMiddleBlockZ() + 0.5D, "chunk");
                 }
 
                 // This is the azimuth/yaw/yRot waypoint. We assume that player stands still and calculate the position.
@@ -137,7 +137,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 
                     // Get the last data, skip if no last data or equal to current data.
                     GyroData lastData = Gyro.ANGLES.putIfAbsent(id, curData);
-                    if (lastData == null || lastData.equals(curData)) break;
+                    if ((lastData == null) || lastData.equals(curData)) break;
                     double lastYaw = lastData.angle();
                     double lastX = lastData.x();
                     double lastZ = lastData.z();
@@ -153,8 +153,8 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
                     double z = ((x * curInvTan) + curCross);
 
                     // If the position is unrealistic, the other player is probably moving.
-                    if (x <= -Level.MAX_LEVEL_SIZE || z <= -Level.MAX_LEVEL_SIZE ||
-                            x >= Level.MAX_LEVEL_SIZE || z >= Level.MAX_LEVEL_SIZE) break;
+                    if ((x <= -Level.MAX_LEVEL_SIZE) || (z <= -Level.MAX_LEVEL_SIZE) ||
+                            (x >= Level.MAX_LEVEL_SIZE) || (z >= Level.MAX_LEVEL_SIZE)) break;
 
                     // Calculate the Euclidean distance and ignore if it's too close.
                     // This is a hack for moving player that forces THEM to recalculate OUR position.
@@ -164,7 +164,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
                     if (distSqr < 64) break;
 
                     // Send the message.
-                    gyro_updateTrackedPosition(way, x, z, "azimuth");
+                    this.gyro_updateTrackedPosition(way, x, z, "azimuth");
                 }
 
                 // This is the other type of waypoint, we should remove everything.
@@ -195,12 +195,11 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
         Gyro.RENDER_POSES.put(id, new GyroRender(x, z, color));
 
         // Send the message.
-        Gui gui = minecraft.gui;
+        Gui gui = this.minecraft.gui;
         String eitherToString = id.right().orElseGet(() -> id.orThrow().toString());
         String name = id.left()
                 .map(this.playerInfoMap::get)
-                .map(PlayerInfo::getProfile)
-                .map(GameProfile::getName)
+                .map(info -> info.getProfile().getName())
                 .orElse("<no player found>");
         gui.getChat().addMessage(Component.literal("Entity ")
                 .append(Component.literal(eitherToString).withStyle(ChatFormatting.GREEN))

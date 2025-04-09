@@ -25,7 +25,7 @@
  */
 
 plugins {
-	alias(libs.plugins.architectury.loom)
+    alias(libs.plugins.architectury.loom)
 }
 
 java.sourceCompatibility = JavaVersion.VERSION_21
@@ -37,83 +37,83 @@ base.archivesName = "gyro-Fabric-25w15a"
 description = "Abuses the newly introduced (1.21.6) Minecraft waypoint system to get player positions."
 
 loom {
-	accessWidenerPath = file("src/main/resources/gyro.accesswidener")
-	log4jConfigs.setFrom("log4j2.xml")
-	silentMojangMappingsLicense()
-	runs.named("client") {
-		vmArgs(
-			// Allow JVM without hotswap to work.
-			"-XX:+IgnoreUnrecognizedVMOptions",
+    accessWidenerPath = file("src/main/resources/gyro.accesswidener")
+    log4jConfigs.setFrom("log4j2.xml")
+    silentMojangMappingsLicense()
+    runs.named("client") {
+        vmArgs(
+            // Allow JVM without hotswap to work.
+            "-XX:+IgnoreUnrecognizedVMOptions",
 
-			// Set up RAM.
-			"-Xmx2G",
+            // Set up RAM.
+            "-Xmx2G",
 
-			// Debug arguments.
-			"-ea",
-			"-Dmixin.debug=true",
-			"-Dmixin.debug.strict=true",
-			"-Dmixin.checks=true",
-			"-Dio.netty.tryReflectionSetAccessible=true",
-			"-Dio.netty.leakDetection.level=PARANOID",
+            // Debug arguments.
+            "-ea",
+            "-Dmixin.debug=true",
+            "-Dmixin.debug.strict=true",
+            "-Dmixin.checks=true",
+            "-Dio.netty.tryReflectionSetAccessible=true",
+            "-Dio.netty.leakDetection.level=PARANOID",
 
-			// Allow hot swapping on supported JVM.
-			"-XX:+AllowEnhancedClassRedefinition",
-			"-XX:+AllowRedefinitionToAddDeleteMethods",
-			"-XX:HotswapAgent=fatjar",
-			"-Dfabric.debug.disableClassPathIsolation=true",
+            // Allow hot swapping on supported JVM.
+            "-XX:+AllowEnhancedClassRedefinition",
+            "-XX:+AllowRedefinitionToAddDeleteMethods",
+            "-XX:HotswapAgent=fatjar",
+            "-Dfabric.debug.disableClassPathIsolation=true",
 
-			// Open modules for Netty.
-			"--add-opens",
-			"java.base/java.nio=ALL-UNNAMED",
-			"--add-opens",
-			"java.base/jdk.internal.misc=ALL-UNNAMED",
-		)
-	}
-	@Suppress("UnstableApiUsage") // <- I want the fancy refmap name. It's completely optional and can be removed anytime.
-	mixin {
-		defaultRefmapName = "gyro.mixins.refmap.json"
-	}
+            // Open modules for Netty.
+            "--add-opens",
+            "java.base/java.nio=ALL-UNNAMED",
+            "--add-opens",
+            "java.base/jdk.internal.misc=ALL-UNNAMED",
+        )
+    }
+    @Suppress("UnstableApiUsage") // <- I want the fancy refmap name. It's completely optional and can be removed anytime.
+    mixin {
+        defaultRefmapName = "gyro.mixins.refmap.json"
+    }
 }
 
 dependencies {
-	// Annotations
-	compileOnly(libs.jspecify)
-	compileOnly(libs.jetbrains.annotations)
+    // Annotations
+    compileOnly(libs.jspecify)
+    compileOnly(libs.jetbrains.annotations)
 
-	// Minecraft
-	minecraft(libs.minecraft)
-	mappings(loom.officialMojangMappings())
-	modImplementation(libs.fabric.loader)
+    // Minecraft
+    minecraft(libs.minecraft)
+    mappings(loom.officialMojangMappings())
+    modImplementation(libs.fabric.loader)
 }
 
 tasks.withType<JavaCompile> {
-	options.encoding = "UTF-8"
-	options.compilerArgs.addAll(listOf("-g", "-parameters"))
-	options.release = 21
+    options.encoding = "UTF-8"
+    options.compilerArgs.addAll(listOf("-g", "-parameters"))
+    options.release = 21
 }
 
 tasks.withType<ProcessResources> {
-	inputs.property("version", version)
-	filesMatching("fabric.mod.json") {
-		expand(inputs.properties)
-	}
+    inputs.property("version", version)
+    filesMatching("fabric.mod.json") {
+        expand(inputs.properties)
+    }
 }
 
 tasks.withType<AbstractArchiveTask> {
-	isPreserveFileTimestamps = false
-	isReproducibleFileOrder = true
+    isPreserveFileTimestamps = false
+    isReproducibleFileOrder = true
 }
 
 tasks.withType<Jar> {
-	from(rootDir.resolve("LICENSE"))
-	manifest {
-		attributes(
-			"Specification-Title" to "gyro",
-			"Specification-Version" to version,
-			"Specification-Vendor" to "VidTu",
-			"Implementation-Title" to "gyro-Fabric-25w15a",
-			"Implementation-Version" to version,
-			"Implementation-Vendor" to "VidTu"
-		)
-	}
+    from(rootDir.resolve("LICENSE"))
+    manifest {
+        attributes(
+            "Specification-Title" to "gyro",
+            "Specification-Version" to version,
+            "Specification-Vendor" to "VidTu",
+            "Implementation-Title" to "gyro-Fabric-25w15a",
+            "Implementation-Version" to version,
+            "Implementation-Vendor" to "VidTu"
+        )
+    }
 }

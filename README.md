@@ -19,13 +19,13 @@ is called "*sources*" by me (not an official name), the receivers are called "*r
 The waypoint sending process is called a "*connection*" (that's actually an official name). This system works like this:
 
 1. If the *receiver* can directly see the chunk in which *source* is located, the whole X/Y/Z position is sent
-   directly to the client. This is called a *vector position* or a *vec3i position* (for "vector, 3 integers".
+   directly to the client. This is called a *vector position* or a *vec3i position* (for "vector, 3 integers").
    This can be easily obtained by any packet listener just by getting the X/Y/Z from the packet. This is precise.
 2. Otherwise, if the *receiver* is localed "*not really far away*" (an official term, which means the player is located
    within the `far_dist` waypoint property, 332 blocks by default) from the *source*, they receive only the chunk
    position where the *source* is located. This is called a *chunk position*. This loses some information,
    but allows us to find the *source*'s chunk, and from there the *vector position* will allow us to find the *source*.
-3. If the *receiver* is located *really far way* the angle (aka yaw, aka the rotation) between the *source* and the
+3. If the *receiver* is located *really far way*, the angle (aka yaw, aka the rotation) between the *source* and the
    *receiver* is calculated server-side and sent to the client. That loses all valuable information from this,
    and it shouldn't be possible to recover the player position, right?
 
@@ -42,7 +42,7 @@ See this image[^2], if you're confused how this works:
 ## License
 
 This project is provided under the MIT License.
-Check out [LICENSE](https://github.com/VidTu/BSCFSIO/blob/main/LICENSE) for more information.
+Check out [LICENSE](https://github.com/VidTu/gyro/blob/main/LICENSE) for more information.
 
 ## Building
 
