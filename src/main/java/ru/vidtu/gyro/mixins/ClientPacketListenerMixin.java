@@ -112,7 +112,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 
                     // Extract the position and send the message.
                     Vec3i vector = ((Vec3iWaypointAccessor) vec).gyro_vector();
-                    this.gyro_updateTrackedPosition(way, vector.getX() + 0.5D, vector.getZ() + 0.5D, "vec3i");
+                    this.gyro_updateTrackedPosition(way, vector.getX(), vector.getZ(), "vec3i");
                 }
 
                 // Chunk waypoint contain the chunk middle position. We'll use the chunk center, no better alternative.
@@ -122,7 +122,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 
                     // Extract the position and send the message.
                     ChunkPos pos = ((ChunkWaypointAccessor) chunk).gyro_chunkPos();
-                    this.gyro_updateTrackedPosition(way, pos.getMiddleBlockX() + 0.5D, pos.getMiddleBlockZ() + 0.5D, "chunk");
+                    this.gyro_updateTrackedPosition(way, pos.getMiddleBlockX(), pos.getMiddleBlockZ(), "chunk");
                 }
 
                 // This is the azimuth/yaw/yRot waypoint. We assume that player stands still and calculate the position.
