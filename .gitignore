@@ -1,0 +1,10 @@
+.gradle/
+.idea/*
+build/
+run/
+!/.idea/codeStyles
+!/.idea/codeStyles/**
+!/.idea/copyright
+!/.idea/copyright/**
+!/.idea/inspectionProfiles
+!/.idea/inspectionProfiles/**

@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "id": "gyro",
+  "version": "${version}",
+  "name": "gyro",
+  "description": "Abuses the newly introduced (1.21.6) Minecraft waypoint system to get player positions.",
+  "authors": [
+    "VidTu"
+  ],
+  "contact": {
+    "homepage": "https://github.com/VidTu/gyro",
+    "sources": "https://github.com/VidTu/gyro",
+    "issues": "https://github.com/VidTu/gyro/issues",
+    "email": "pig@vidtu.ru",
+    "discord": "https://discord.gg/Q6saSVSuYQ"
+  },
+  "license": "MIT",
+  "icon": "gyro.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "ru.vidtu.gyro.Gyro"
+    ]
+  },
+  "accessWidener": "gyro.accesswidener",
+  "mixins": [
+    "gyro.mixins.json"
+  ],
+  "depends": {
+    "minecraft": "1.21.6-alpha.25.15.a"
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.github_releases": "https://github.com/VidTu/gyro/releases",
+        "modmenu.discord": "https://discord.gg/Q6saSVSuYQ"
+      }
+    }
+  }
+}

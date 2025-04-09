@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_21",
+  "package": "ru.vidtu.gyro.mixins",
+  "refmap": "gyro.mixins.refmap.json",
+  "mixins": [
+    "ClientPacketListenerMixin",
+    "LevelRendererMixin",
+    "MinecraftMixin",
+    "access.AzimuthWaypointAccessor",
+    "access.ChunkWaypointAccessor",
+    "access.Vec3iWaypointAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
