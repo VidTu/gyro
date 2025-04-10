@@ -33,7 +33,7 @@ java.targetCompatibility = JavaVersion.VERSION_21
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 group = "ru.vidtu.gyro"
-base.archivesName = "gyro-Fabric-25w15a"
+base.archivesName = "gyro"
 description = "Abuses the newly introduced (1.21.6) Minecraft waypoint system to get player positions."
 
 loom {
@@ -116,7 +116,7 @@ tasks.withType<Jar> {
             "Specification-Title" to "gyro",
             "Specification-Version" to version,
             "Specification-Vendor" to "VidTu",
-            "Implementation-Title" to "gyro-Fabric-25w15a",
+            "Implementation-Title" to "gyro",
             "Implementation-Version" to version,
             "Implementation-Vendor" to "VidTu"
         )
