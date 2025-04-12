@@ -50,6 +50,7 @@ loom {
 
             // Debug arguments.
             "-ea",
+            "-esa",
             "-Dmixin.debug=true",
             "-Dmixin.debug.strict=true",
             "-Dmixin.checks=true",
