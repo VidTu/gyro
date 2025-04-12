@@ -67,7 +67,7 @@ loom {
             "--add-opens",
             "java.base/java.nio=ALL-UNNAMED",
             "--add-opens",
-            "java.base/jdk.internal.misc=ALL-UNNAMED",
+            "java.base/jdk.internal.misc=ALL-UNNAMED"
         )
     }
     @Suppress("UnstableApiUsage") // <- I want the fancy refmap name. It's completely optional and can be removed anytime.
