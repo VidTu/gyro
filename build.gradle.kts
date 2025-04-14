@@ -95,6 +95,8 @@ dependencies {
     // Minecraft
     minecraft(libs.minecraft)
     mappings(loom.officialMojangMappings())
+
+    // Fabric
     modImplementation(libs.fabric.loader)
 }
 
