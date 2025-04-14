@@ -24,6 +24,12 @@
  * SPDX-License-Identifier: MIT
  */
 
+import com.google.gson.Gson
+import com.google.gson.JsonElement
+import net.fabricmc.loom.task.RemapJarTask
+import net.fabricmc.loom.util.ZipUtils
+import net.fabricmc.loom.util.ZipUtils.UnsafeUnaryOperator
+
 plugins {
     alias(libs.plugins.architectury.loom)
 }
@@ -103,6 +109,13 @@ tasks.withType<ProcessResources> {
     filesMatching("fabric.mod.json") {
         expand(inputs.properties)
     }
+    fileTree(outputs.files.asPath).forEach {
+        if (it.name.endsWith(".json")) {
+            doLast {
+                it.writeText(Gson().fromJson(it.readText(), JsonElement::class.java).toString())
+            }
+        }
+    }
 }
 
 tasks.withType<AbstractArchiveTask> {
@@ -121,5 +134,15 @@ tasks.withType<Jar> {
             "Implementation-Version" to version,
             "Implementation-Vendor" to "VidTu"
         )
+    }
+}
+
+tasks.withType<RemapJarTask> {
+    val minifier = UnsafeUnaryOperator<String> { Gson().fromJson(it, JsonElement::class.java).toString() }
+    doLast {
+        ZipUtils.transformString(archiveFile.get().asFile.toPath(), mapOf(
+            "gyro.mixins.json" to minifier,
+            "gyro.mixins.refmap.json" to minifier,
+        ))
     }
 }
