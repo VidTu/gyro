@@ -121,7 +121,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
             }
 
             // Extract the data.
-            TrackedWaypoint way = packet.waypoint();
+            TrackedWaypoint way = packet.waypoint(); // Implicit NPE for 'packet'
             Either<UUID, String> id = way.id();
 
             // Depend the action on the waypoint type.

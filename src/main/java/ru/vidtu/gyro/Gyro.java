@@ -82,6 +82,6 @@ public final class Gyro implements ClientModInitializer {
     @Contract(pure = true)
     @Override
     public String toString() {
-        return "Gyro{}";
+        return "gyro{}";
     }
 }

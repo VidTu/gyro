@@ -45,7 +45,7 @@ public record GyroRender(double x, double z, int color) {
     @Contract(pure = true)
     @Override
     public String toString() {
-        return "Gyro/GyroRender{" +
+        return "gyro/GyroRender{" +
                 "x=" + this.x +
                 ", z=" + this.z +
                 ", color=" + this.color +

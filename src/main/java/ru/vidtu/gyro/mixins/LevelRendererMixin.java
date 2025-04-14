@@ -123,8 +123,8 @@ public class LevelRendererMixin {
         RenderSystem.setShaderFog(FogParameters.NO_FOG);
 
         // Get the camera position and offset by it.
-        Vec3 cam = camera.getPosition();
-        pose.pushPose();
+        Vec3 cam = camera.getPosition(); // Implicit NPE for 'camera'
+        pose.pushPose(); // Implicit NPE for 'pose'
         pose.translate(-cam.x(), 0.0D, -cam.z());
 
         // Extract the level.
@@ -135,7 +135,7 @@ public class LevelRendererMixin {
         for (GyroRender pos : poses) {
             pose.pushPose();
             pose.translate(pos.x(), 0.0D, pos.z());
-            BeaconRenderer.renderBeaconBeam(pose, source, GYRO_BEACON_BEAM, tickDelta, /*scale=*/1.0F, level.getGameTime(), /*verticalOffset=*/-1024, /*beamHeight=*/2048, pos.color(), /*solidSize=*/0.15F, /*transparentSize=*/0.175F);
+            BeaconRenderer.renderBeaconBeam(pose, source, GYRO_BEACON_BEAM, tickDelta, /*scale=*/1.0F, level.getGameTime(), /*verticalOffset=*/-1024, /*beamHeight=*/2048, pos.color(), /*solidSize=*/0.15F, /*transparentSize=*/0.175F); // Implicit NPE for 'source', 'level'
             pose.popPose();
         }
 

@@ -42,7 +42,7 @@ import org.jspecify.annotations.NullMarked;
 public record GyroData(float angle, double x, double z) {
     @Override
     public String toString() {
-        return "Gyro/GyroData{" +
+        return "gyro/GyroData{" +
                 "angle=" + this.angle +
                 ", x=" + this.x +
                 ", z=" + this.z +
