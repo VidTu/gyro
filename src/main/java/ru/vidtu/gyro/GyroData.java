@@ -36,6 +36,7 @@ import org.jspecify.annotations.NullMarked;
  * @param x     Player X position (at the moment of receiving the angle)
  * @param z     Player Z position (at the moment of receiving the angle)
  * @author VidTu
+ * @apiNote Internal use only
  */
 @ApiStatus.Internal
 @NullMarked

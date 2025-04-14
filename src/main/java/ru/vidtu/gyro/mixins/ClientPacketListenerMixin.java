@@ -66,6 +66,7 @@ import java.util.UUID;
  * A mixin for {@link ClientPacketListenerMixin} which intercepts incoming waypoints and leaks/calculates their positions.
  *
  * @author VidTu
+ * @apiNote Internal use only
  */
 // @ApiStatus.Internal // Can't annotate this without logging in the console.
 @Mixin(ClientPacketListener.class)

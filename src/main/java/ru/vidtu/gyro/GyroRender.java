@@ -38,6 +38,7 @@ import ru.vidtu.gyro.mixins.LevelRendererMixin;
  * @param z     Waypoint alleged Z position
  * @param color Waypoint ARGB color
  * @author VidTu
+ * @apiNote Internal use only
  */
 @ApiStatus.Internal
 @NullMarked

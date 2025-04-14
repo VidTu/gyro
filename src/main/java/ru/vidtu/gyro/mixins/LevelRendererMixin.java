@@ -57,6 +57,7 @@ import java.util.Collection;
  * Mixin that renders beacon beams on {@link Gyro#RENDER_POSES}.
  *
  * @author VidTu
+ * @apiNote Internal use only
  */
 // @ApiStatus.Internal // Can't annotate this without logging in the console.
 @Mixin(LevelRenderer.class)

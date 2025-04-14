@@ -44,6 +44,7 @@ import java.util.UUID;
  * Main gyro class.
  *
  * @author VidTu
+ * @apiNote Internal use only
  */
 @ApiStatus.Internal
 @NullMarked

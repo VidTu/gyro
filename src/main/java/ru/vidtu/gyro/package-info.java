@@ -28,6 +28,7 @@
  * Main gyro package.
  *
  * @author VidTu
+ * @apiNote Internal use only
  */
 @ApiStatus.Internal
 @NullMarked

@@ -46,6 +46,7 @@ import ru.vidtu.gyro.Gyro;
  * Mixin that clears {@link Gyro#RENDER_POSES} and {@link Gyro#ANGLES} on world switching.
  *
  * @author VidTu
+ * @apiNote Internal use only
  */
 // @ApiStatus.Internal // Can't annotate this without logging in the console.
 @Mixin(Minecraft.class)

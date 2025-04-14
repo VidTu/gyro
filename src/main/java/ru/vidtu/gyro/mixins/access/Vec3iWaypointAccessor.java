@@ -37,6 +37,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
  * Accessor for {@code vector} in {@link TrackedWaypoint.Vec3iWaypoint}.
  *
  * @author VidTu
+ * @apiNote Internal use only
  */
 // @ApiStatus.Internal // Can't annotate this without logging in the console.
 @Mixin(TrackedWaypoint.Vec3iWaypoint.class)

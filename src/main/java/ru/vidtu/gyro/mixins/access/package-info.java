@@ -28,6 +28,7 @@
  * gyro package with accessors to inject.
  *
  * @author VidTu
+ * @apiNote Internal use only
  */
 @ApiStatus.Internal
 @NullMarked

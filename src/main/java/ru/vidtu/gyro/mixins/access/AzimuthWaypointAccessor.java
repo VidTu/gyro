@@ -36,6 +36,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
  * Accessor for {@code angle} in {@link TrackedWaypoint.AzimuthWaypoint}.
  *
  * @author VidTu
+ * @apiNote Internal use only
  */
 // @ApiStatus.Internal // Can't annotate this without logging in the console.
 @Mixin(TrackedWaypoint.AzimuthWaypoint.class)

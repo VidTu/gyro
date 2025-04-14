@@ -28,6 +28,7 @@
  * gyro package with mixins to inject.
  *
  * @author VidTu
+ * @apiNote Internal use only
  */
 @ApiStatus.Internal
 @NullMarked
