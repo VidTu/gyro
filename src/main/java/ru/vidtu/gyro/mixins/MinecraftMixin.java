@@ -28,6 +28,8 @@ package ru.vidtu.gyro.mixins;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.util.profiling.Profiler;
+import net.minecraft.util.profiling.ProfilerFiller;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
@@ -78,6 +80,10 @@ public final class MinecraftMixin {
         // Validate.
         assert ci != null : "gyro: Parameter 'ci' is null. (level: " + level + ", game: " + this + ')';
 
+        // Get the profiler.
+        ProfilerFiller profiler = Profiler.get();
+        profiler.push("gyro:clear_data");
+
         // Log. (**TRACE**)
         if (GYRO_LOGGER.isTraceEnabled()) {
             GYRO_LOGGER.trace("gyro: Clearing data... (level: {}, ci: {}, game: {})", level, ci, this);
@@ -88,7 +94,11 @@ public final class MinecraftMixin {
         Gyro.RENDER_POSES.clear();
 
         // Log. (**DEBUG**)
-        if (!GYRO_LOGGER.isDebugEnabled()) return;
-        GYRO_LOGGER.debug("gyro: Data has been cleared. (level: {}, ci: {}, game: {})", level, ci, this);
+        if (GYRO_LOGGER.isDebugEnabled()) {
+            GYRO_LOGGER.debug("gyro: Data has been cleared. (level: {}, ci: {}, game: {})", level, ci, this);
+        }
+
+        // Pop the profiler.
+        profiler.pop();
     }
 }

@@ -36,6 +36,8 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundTrackedWaypointPacket;
 import net.minecraft.util.ARGB;
+import net.minecraft.util.profiling.Profiler;
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.waypoints.TrackedWaypoint;
@@ -115,6 +117,10 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 
         // Schedule it on the minecraft thread to avoid threading issues. Don't use ensureRunningOnSameThread to avoid compat issues.
         this.minecraft.execute(() -> {
+            // Get and push the profiler.
+            ProfilerFiller profiler = Profiler.get();
+            profiler.push("gyro:handle_waypoint_packet");
+
             // Log. (**TRACE**)
             if (GYRO_LOGGER.isTraceEnabled()) {
                 GYRO_LOGGER.trace("gyro: Got waypoint on the game thread. (packet: {}, ci: {}, listener: {})", packet, ci, this);
@@ -253,6 +259,9 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
                     GYRO_LOGGER.debug("gyro: Removed unknown waypoint. (packet: {}, ci: {}, way: {}, id: {}, listener: {})", packet, ci, way, id, this);
                 }
             }
+
+            // Pop the profiler.
+            profiler.pop();
         });
     }
 

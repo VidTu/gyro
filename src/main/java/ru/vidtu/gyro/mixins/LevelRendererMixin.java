@@ -35,6 +35,8 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BeaconRenderer;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.profiling.Profiler;
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Contract;
@@ -114,6 +116,10 @@ public class LevelRendererMixin {
         assert (tickDelta >= 0.0F) && (tickDelta <= 1.0F) : "gyro: Parameter 'tickDelta' is not in the [0..1] range. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", tickDelta: " + tickDelta + ", ci: " + ci + ", renderer: " + this + ')';
         assert ci != null : "gyro: Parameter 'ci' is null. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", tickDelta: " + tickDelta + ", renderer: " + this + ')';
 
+        // Get and push the profiler.
+        ProfilerFiller profiler = Profiler.get();
+        profiler.push("gyro:render_beams");
+
         // Get the poses to render, skip if none.
         Collection<GyroRender> poses = Gyro.RENDER_POSES.values();
         if (poses.isEmpty()) return;
@@ -144,5 +150,8 @@ public class LevelRendererMixin {
 
         // Re-enable the fog.
         RenderSystem.setShaderFog(fog);
+
+        // Pop the profiler.
+        profiler.pop();
     }
 }
