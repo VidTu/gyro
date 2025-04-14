@@ -80,7 +80,7 @@ public final class MinecraftMixin {
         // Validate.
         assert ci != null : "gyro: Parameter 'ci' is null. (level: " + level + ", game: " + this + ')';
 
-        // Get the profiler.
+        // Get and push the profiler.
         ProfilerFiller profiler = Profiler.get();
         profiler.push("gyro:clear_data");
 
