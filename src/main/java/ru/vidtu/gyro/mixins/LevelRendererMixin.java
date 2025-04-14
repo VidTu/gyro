@@ -107,12 +107,12 @@ public class LevelRendererMixin {
                                                  MultiBufferSource.BufferSource blockBreakAnimSource,
                                                  Camera camera, float tickDelta, CallbackInfo ci) {
         // Validate.
-        assert pose != null : "Gyro: Parameter 'pose' is null. (source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", tickDelta: " + tickDelta + ", ci: " + ci + ", renderer: " + this + ')';
-        assert source != null : "Gyro: Parameter 'source' is null. (pose: " + pose + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", tickDelta: " + tickDelta + ", ci: " + ci + ", renderer: " + this + ')';
-        assert blockBreakAnimSource != null : "Gyro: Parameter 'blockBreakAnimSource' is null. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", tickDelta: " + tickDelta + ", ci: " + ci + ", renderer: " + this + ')';
-        assert camera != null : "Gyro: Parameter 'camera' is null. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", tickDelta: " + tickDelta + ", ci: " + ci + ", renderer: " + this + ')';
-        assert (tickDelta >= 0.0F) && (tickDelta <= 1.0F) : "Gyro: Parameter 'tickDelta' is not in the [0..1] range. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", tickDelta: " + tickDelta + ", ci: " + ci + ", renderer: " + this + ')';
-        assert ci != null : "Gyro: Parameter 'ci' is null. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", tickDelta: " + tickDelta + ", renderer: " + this + ')';
+        assert pose != null : "gyro: Parameter 'pose' is null. (source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", tickDelta: " + tickDelta + ", ci: " + ci + ", renderer: " + this + ')';
+        assert source != null : "gyro: Parameter 'source' is null. (pose: " + pose + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", tickDelta: " + tickDelta + ", ci: " + ci + ", renderer: " + this + ')';
+        assert blockBreakAnimSource != null : "gyro: Parameter 'blockBreakAnimSource' is null. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", tickDelta: " + tickDelta + ", ci: " + ci + ", renderer: " + this + ')';
+        assert camera != null : "gyro: Parameter 'camera' is null. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", tickDelta: " + tickDelta + ", ci: " + ci + ", renderer: " + this + ')';
+        assert (tickDelta >= 0.0F) && (tickDelta <= 1.0F) : "gyro: Parameter 'tickDelta' is not in the [0..1] range. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", tickDelta: " + tickDelta + ", ci: " + ci + ", renderer: " + this + ')';
+        assert ci != null : "gyro: Parameter 'ci' is null. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", tickDelta: " + tickDelta + ", renderer: " + this + ')';
 
         // Get the poses to render, skip if none.
         Collection<GyroRender> poses = Gyro.RENDER_POSES.values();
@@ -129,7 +129,7 @@ public class LevelRendererMixin {
 
         // Extract the level.
         ClientLevel level = this.level;
-        assert level != null : "Gyro: Rendering block entities without a client level. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", tickDelta: " + tickDelta + ", ci: " + ci + ", renderer: " + this + ')';
+        assert level != null : "gyro: Rendering block entities without a client level. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", tickDelta: " + tickDelta + ", ci: " + ci + ", renderer: " + this + ')';
 
         // Render each pos as a beam.
         for (GyroRender pos : poses) {

@@ -53,7 +53,7 @@ public final class MinecraftMixin {
      * Logger for this class.
      */
     @Unique
-    private static final Logger GYRO_LOGGER = LoggerFactory.getLogger("Gyro/MinecraftMixin");
+    private static final Logger GYRO_LOGGER = LoggerFactory.getLogger("gyro/MinecraftMixin");
 
     /**
      * An instance of this class cannot be created.
@@ -76,11 +76,11 @@ public final class MinecraftMixin {
     @Inject(method = "updateLevelInEngines", at = @At("RETURN"))
     private void gyro_updateLevelInEngines_return(@Nullable ClientLevel level, CallbackInfo ci) {
         // Validate.
-        assert ci != null : "Gyro: Parameter 'ci' is null. (level: " + level + ", game: " + this + ')';
+        assert ci != null : "gyro: Parameter 'ci' is null. (level: " + level + ", game: " + this + ')';
 
         // Log. (**TRACE**)
         if (GYRO_LOGGER.isTraceEnabled()) {
-            GYRO_LOGGER.trace("Gyro: Clearing data... (level: {}, ci: {}, game: {})", level, ci, this);
+            GYRO_LOGGER.trace("gyro: Clearing data... (level: {}, ci: {}, game: {})", level, ci, this);
         }
 
         // Clear.
@@ -89,6 +89,6 @@ public final class MinecraftMixin {
 
         // Log. (**DEBUG**)
         if (!GYRO_LOGGER.isDebugEnabled()) return;
-        GYRO_LOGGER.debug("Gyro: Data has been cleared. (level: {}, ci: {}, game: {})", level, ci, this);
+        GYRO_LOGGER.debug("gyro: Data has been cleared. (level: {}, ci: {}, game: {})", level, ci, this);
     }
 }
