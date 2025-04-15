@@ -27,7 +27,7 @@
     "gyro.mixins.json"
   ],
   "depends": {
-    "minecraft": "1.21.6-alpha.25.15.a"
+    "minecraft": "1.21.6-alpha.25.16.a"
   },
   "custom": {
     "modmenu": {

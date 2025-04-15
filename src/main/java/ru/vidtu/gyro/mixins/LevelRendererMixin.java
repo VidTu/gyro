@@ -26,11 +26,12 @@
 
 package ru.vidtu.gyro.mixins;
 
+import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.FogParameters;
+import net.minecraft.client.renderer.FogRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BeaconRenderer;
@@ -42,6 +43,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -82,6 +84,13 @@ public class LevelRendererMixin {
     @Shadow
     @Nullable
     private ClientLevel level;
+
+    /**
+     * Fog renderer implementation.
+     */
+    @Shadow
+    @Final
+    private FogRenderer fogRenderer;
 
     /**
      * An instance of this class cannot be created.
@@ -126,8 +135,8 @@ public class LevelRendererMixin {
         if (poses.isEmpty()) return;
 
         // Disable the fog temporarily.
-        FogParameters fog = RenderSystem.getShaderFog();
-        RenderSystem.setShaderFog(FogParameters.NO_FOG);
+        GpuBufferSlice fog = RenderSystem.getShaderFog();
+        RenderSystem.setShaderFog(this.fogRenderer.getBuffer(FogRenderer.FogMode.NONE));
 
         // Get the camera position and offset by it.
         Vec3 cam = camera.getPosition(); // Implicit NPE for 'camera'
