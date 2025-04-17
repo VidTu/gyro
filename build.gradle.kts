@@ -54,6 +54,9 @@ loom {
             // Set up RAM.
             "-Xmx2G",
 
+            // Force UNIX newlines.
+            "-Dline.separator=\n",
+
             // Debug arguments.
             "-ea",
             "-esa",
