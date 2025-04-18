@@ -78,26 +78,19 @@ public final class MinecraftMixin {
      */
     @Inject(method = "updateLevelInEngines", at = @At("RETURN"))
     private void gyro_updateLevelInEngines_return(@Nullable ClientLevel level, CallbackInfo ci) {
-        // Validate.
-        assert ci != null : "gyro: Parameter 'ci' is null. (level: " + level + ", game: " + this + ')';
-
         // Get and push the profiler.
         ProfilerFiller profiler = Profiler.get();
         profiler.push("gyro:clear_data");
 
         // Log. (**TRACE**)
-        if (GYRO_LOGGER.isTraceEnabled()) {
-            GYRO_LOGGER.trace("gyro: Clearing data... (level: {}, ci: {}, game: {})", level, ci, this);
-        }
+        GYRO_LOGGER.trace("gyro: Clearing data... (level: {}, game: {})", level, this);
 
         // Clear.
         Gyro.ANGLES.clear();
         Gyro.RENDER_POSES.clear();
 
         // Log. (**DEBUG**)
-        if (GYRO_LOGGER.isDebugEnabled()) {
-            GYRO_LOGGER.debug("gyro: Data has been cleared. (level: {}, ci: {}, game: {})", level, ci, this);
-        }
+        GYRO_LOGGER.debug("gyro: Data has been cleared. (level: {}, game: {})", level, this);
 
         // Pop the profiler.
         profiler.pop();
