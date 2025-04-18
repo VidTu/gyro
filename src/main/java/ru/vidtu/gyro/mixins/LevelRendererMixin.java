@@ -131,7 +131,11 @@ public class LevelRendererMixin {
 
         // Get the poses to render, skip if none.
         Collection<GyroRender> poses = Gyro.RENDER_POSES.values();
-        if (poses.isEmpty()) return;
+        if (poses.isEmpty()) {
+            // Pop, stop.
+            profiler.pop();
+            return;
+        }
 
         // Disable the fog temporarily.
         GpuBufferSlice fog = RenderSystem.getShaderFog();
