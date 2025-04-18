@@ -5,7 +5,7 @@ Abuses the newly introduced (1.21.6) Minecraft waypoint system to get player pos
 ## Dependencies
 
 - Fabric Loader (>=0.16.13)
-- Minecraft (25w15a)
+- Minecraft (25w16a)
 
 ## Download
 
