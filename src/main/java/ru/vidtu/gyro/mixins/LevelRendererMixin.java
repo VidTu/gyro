@@ -105,7 +105,7 @@ public class LevelRendererMixin {
     }
 
     /**
-     * Handles the block entity rendering.
+     * Handles the beacon beam rendering for {@link Gyro#RENDER_POSES}.
      *
      * @param pose                 The current pose stack
      * @param source               Buffer rendering source

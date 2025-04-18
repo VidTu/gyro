@@ -71,7 +71,7 @@ public final class MinecraftMixin {
     }
 
     /**
-     * Clears the {@link Gyro#RENDER_POSES}.
+     * Clears the {@link Gyro#RENDER_POSES} and {@link Gyro#ANGLES}.
      *
      * @param level New level, {@code null} if was unloaded, ignored
      * @param ci    Callback data, ignored
