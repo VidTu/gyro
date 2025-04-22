@@ -2,14 +2,18 @@
 
 Abuses the newly introduced (1.21.6) Minecraft waypoint system to get player positions.
 
+## Downloads
+
+- [GitHub Releases](https://github.com/VidTu/gyro/releases)
+
 ## Dependencies
+
+This mod has _no dependencies_, besides the loader and the game, you'll need:
 
 - Fabric Loader (>=0.16.13)
 - Minecraft (25w16a)
 
-## Download
-
-- [GitHub Releases](https://github.com/VidTu/gyro/releases)
+Fabric API is **NOT** required.
 
 ## About
 
