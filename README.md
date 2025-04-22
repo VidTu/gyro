@@ -61,7 +61,7 @@ You'll need a GitHub account to download these.
 
 **Q**: Is this mod open source?  
 **A**: [Yes.](https://github.com/VidTu/gyro) (Licensed
-under [MIT](https://github.com/VidTu/gyro/blob/main/LICENSE))
+under [MIT License](https://github.com/VidTu/gyro/blob/main/LICENSE))
 
 **Q**: Is this mod client-side or server-side?  
 **A**: This mod works on the client-side.
@@ -72,6 +72,7 @@ under [MIT](https://github.com/VidTu/gyro/blob/main/LICENSE))
 **Q**: I've found a bug.  
 **A**: Report it [here](https://github.com/VidTu/gyro/issues). If you are not sure whether this is a bug or a
 simple question, you can join the [Discord](https://discord.gg/Q6saSVSuYQ).
+Report security vulnerabilities [here](https://github.com/VidTu/gyro/security).
 
 **Q**: Can I use this in my modpack?  
 **A**: Sure. Credit (e.g. a link to mod's GitHub page) is appreciated, but is not required.
