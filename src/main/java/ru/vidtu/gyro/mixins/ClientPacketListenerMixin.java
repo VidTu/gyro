@@ -189,7 +189,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
                     GyroData curData = new GyroData(curYaw, curX, curZ);
 
                     // Get the last data, skip if no last data or equal to current data.
-                    GyroData lastData = Gyro.ANGLES.putIfAbsent(id, curData);
+                    GyroData lastData = Gyro.ANGLES.put(id, curData);
                     if ((lastData == null) || lastData.equals(curData)) {
                         // Log, stop. (**DEBUG**)
                         if (!GYRO_LOGGER.isDebugEnabled()) break;

@@ -27,6 +27,7 @@
 package ru.vidtu.gyro;
 
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -41,10 +42,12 @@ import org.jspecify.annotations.NullMarked;
 @ApiStatus.Internal
 @NullMarked
 public record GyroData(float angle, double x, double z) {
+    @Contract(pure = true)
     @Override
     public String toString() {
         return "gyro/GyroData{" +
                 "angle=" + this.angle +
+                ", angleDegrees=" + Math.toDegrees(this.angle) +
                 ", x=" + this.x +
                 ", z=" + this.z +
                 '}';
