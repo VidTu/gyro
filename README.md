@@ -47,8 +47,8 @@ See this image[^2], if you're confused about how this works:
 
 **Q**: Where can I download this mod?  
 **A**: [GitHub Releases](https://github.com/VidTu/gyro/releases).
-You can also find unstable builds at [GitHub Actions](https://github.com/VidTu/gyro/actions),
-you'll need a GitHub account to download them.
+You can also find unstable builds at [GitHub Actions](https://github.com/VidTu/gyro/actions).
+You'll need a GitHub account to download these.
 
 **Q**: Which mod loaders are supported?  
 **A**: Fabric is supported. Quilt should work too.
@@ -75,7 +75,7 @@ simple question, you can join the [Discord](https://discord.gg/Q6saSVSuYQ).
 
 **Q**: Can I use this in my modpack?  
 **A**: Sure. Credit (e.g. a link to mod's GitHub page) is appreciated, but is not required.
-Monetization and redistributing is allowed as per the [MIT License](https://github.com/VidTu/gyro/blob/main/LICENSE).
+Monetization and redistribution are allowed as per the [MIT License](https://github.com/VidTu/gyro/blob/main/LICENSE).
 Beware: This mod may be considered a hack by some people.
 
 **Q**: Why is this mod not on the Modrinth or CurseForge?  
