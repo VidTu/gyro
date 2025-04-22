@@ -9,7 +9,7 @@ Abuses the newly introduced (1.21.6) Minecraft waypoint system to get player pos
 
 ## Download
 
-- [GitHub](https://github.com/VidTu/gyro/releases)
+- [GitHub Releases](https://github.com/VidTu/gyro/releases)
 
 ## About
 
@@ -36,8 +36,46 @@ See this image[^2], if you're confused about how this works:
 
 ![an image of two tans crossing](taninfo.png)
 
-[^1]: Not yet confirmed to be 1.21.6.
-[^2]: Background map from [minecraft.wiki](https://minecraft.wiki/index.php?curid=122350).
+## FAQ
+
+**Q**: I need help, have some questions, or have some other feedback.  
+**A**: You can join the [Discord server](https://discord.gg/Q6saSVSuYQ).
+
+**Q**: Where can I download this mod?  
+**A**: [GitHub Releases](https://github.com/VidTu/gyro/releases).
+You can also find unstable builds at [GitHub Actions](https://github.com/VidTu/gyro/actions),
+you'll need a GitHub account to download them.
+
+**Q**: Which mod loaders are supported?  
+**A**: Fabric is supported. Quilt should work too.
+
+**Q**: Which Minecraft versions are supported?  
+**A**: Minecraft 25w16a. (a snapshot for 1.21.6[^1])
+
+**Q**: Do I need to install Fabric API or Quilt Standard Libraries?  
+**A**: No, but you can install these for other mods.
+
+**Q**: Is this mod open source?  
+**A**: [Yes.](https://github.com/VidTu/gyro) (Licensed
+under [MIT](https://github.com/VidTu/gyro/blob/main/LICENSE))
+
+**Q**: Is this mod client-side or server-side?  
+**A**: This mod works on the client-side.
+
+**Q**: Is this a hack?  
+**A**: It's a proof of concept. This can be counted as hack depending on your opinion on what's hack and what's not.
+
+**Q**: I've found a bug.  
+**A**: Report it [here](https://github.com/VidTu/gyro/issues). If you are not sure whether this is a bug or a
+simple question, you can join the [Discord](https://discord.gg/Q6saSVSuYQ).
+
+**Q**: Can I use this in my modpack?  
+**A**: Sure. Credit (e.g. a link to mod's GitHub page) is appreciated, but is not required.
+Monetization and redistributing is allowed as per the [MIT License](https://github.com/VidTu/gyro/blob/main/LICENSE).
+Beware: This mod may be considered a hack by some people.
+
+**Q**: Why is this mod not on the Modrinth or CurseForge?  
+**A**: It's a proof of concept and may be also considered a hack by these platforms.
 
 ## License
 
@@ -50,3 +88,7 @@ Check out [LICENSE](https://github.com/VidTu/gyro/blob/main/LICENSE) for more in
 2. Install Java 21 and dump it into PATH and/or JAVA_HOME.
 3. Run `./gradlew build` from the terminal/PowerShell.
 4. Grab the JAR from the `./build/libs/` folder.
+
+[^1]: Not yet confirmed to be 1.21.6.
+
+[^2]: Background map from [minecraft.wiki](https://minecraft.wiki/index.php?curid=122350).
