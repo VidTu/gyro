@@ -83,14 +83,14 @@ public final class MinecraftMixin {
         profiler.push("gyro:clear_data");
 
         // Log. (**TRACE**)
-        GYRO_LOGGER.trace("gyro: Clearing data... (level: {}, game: {})", level, this);
+        GYRO_LOGGER.trace(Gyro.GYRO_MARKER, "gyro: Clearing data... (level: {}, game: {})", level, this);
 
         // Clear.
         Gyro.ANGLES.clear();
         Gyro.RENDER_POSES.clear();
 
         // Log. (**DEBUG**)
-        GYRO_LOGGER.debug("gyro: Data has been cleared. (level: {}, game: {})", level, this);
+        GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Data has been cleared. (level: {}, game: {})", level, this);
 
         // Pop the profiler.
         profiler.pop();

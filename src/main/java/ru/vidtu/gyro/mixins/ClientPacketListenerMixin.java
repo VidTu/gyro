@@ -111,7 +111,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
         assert packet != null : "gyro: Parameter 'packet' is null. (listener: " + this + ')';
 
         // Log. (**TRACE**)
-        GYRO_LOGGER.trace("gyro: Received waypoint, delegating to game thread. (packet: {}, listener: {})", packet, this);
+        GYRO_LOGGER.trace(Gyro.GYRO_MARKER, "gyro: Received waypoint, delegating to game thread. (packet: {}, listener: {})", packet, this);
 
         // Schedule it on the minecraft thread to avoid threading issues. Don't use ensureRunningOnSameThread to avoid compat issues.
         this.minecraft.execute(() -> {
@@ -120,7 +120,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
             profiler.push("gyro:handle_waypoint_packet");
 
             // Log. (**TRACE**)
-            GYRO_LOGGER.trace("gyro: Got waypoint on the game thread. (packet: {}, listener: {})", packet, this);
+            GYRO_LOGGER.trace(Gyro.GYRO_MARKER, "gyro: Got waypoint on the game thread. (packet: {}, listener: {})", packet, this);
 
             // Extract the data.
             TrackedWaypoint way = packet.waypoint(); // Implicit NPE for 'packet'
@@ -131,8 +131,8 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
                 // Vector waypoints basically contain the whole position. Yummy!
                 case TrackedWaypoint.Vec3iWaypoint vec -> {
                     // Log. (**TRACE**)
-                    if (GYRO_LOGGER.isTraceEnabled()) {
-                        GYRO_LOGGER.trace("gyro: Vec3i waypoint received, adding... (packet: {}, way: {}, id: {}, listener: {})", packet, way, id, this);
+                    if (GYRO_LOGGER.isTraceEnabled(Gyro.GYRO_MARKER)) {
+                        GYRO_LOGGER.trace(Gyro.GYRO_MARKER, "gyro: Vec3i waypoint received, adding... (packet: {}, way: {}, id: {}, listener: {})", packet, way, id, this);
                     }
 
                     // Clear the angles data.
@@ -143,15 +143,15 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
                     this.gyro_updateTrackedPosition(way, vector.getX(), vector.getZ(), "vec3i");
 
                     // Log. (**DEBUG**)
-                    if (!GYRO_LOGGER.isDebugEnabled()) break;
-                    GYRO_LOGGER.debug("gyro: Added Vec3i waypoint. (packet: {}, way: {}, id: {}, vector: {}, listener: {})", packet, way, id, vector, this);
+                    if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) break;
+                    GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Added Vec3i waypoint. (packet: {}, way: {}, id: {}, vector: {}, listener: {})", packet, way, id, vector, this);
                 }
 
                 // Chunk waypoint contain the chunk middle position. We'll use the chunk center, no better alternative.
                 case TrackedWaypoint.ChunkWaypoint chunk -> {
                     // Log. (**TRACE**)
-                    if (GYRO_LOGGER.isTraceEnabled()) {
-                        GYRO_LOGGER.trace("gyro: Chunk waypoint received, adding... (packet: {}, way: {}, id: {}, listener: {})", packet, way, id, this);
+                    if (GYRO_LOGGER.isTraceEnabled(Gyro.GYRO_MARKER)) {
+                        GYRO_LOGGER.trace(Gyro.GYRO_MARKER, "gyro: Chunk waypoint received, adding... (packet: {}, way: {}, id: {}, listener: {})", packet, way, id, this);
                     }
 
                     // Clear the angles data.
@@ -162,23 +162,23 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
                     this.gyro_updateTrackedPosition(way, pos.getMiddleBlockX(), pos.getMiddleBlockZ(), "chunk");
 
                     // Log. (**DEBUG**)
-                    if (!GYRO_LOGGER.isDebugEnabled()) break;
-                    GYRO_LOGGER.debug("gyro: Added Chunk waypoint. (packet: {}, way: {}, id: {}, pos: {}, listener: {})", packet, way, id, pos, this);
+                    if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) break;
+                    GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Added Chunk waypoint. (packet: {}, way: {}, id: {}, pos: {}, listener: {})", packet, way, id, pos, this);
                 }
 
                 // This is the azimuth/yaw/yRot waypoint. We assume that player stands still and calculate the position.
                 case TrackedWaypoint.AzimuthWaypoint azimuth -> {
                     // Log. (**TRACE**)
-                    if (GYRO_LOGGER.isTraceEnabled()) {
-                        GYRO_LOGGER.trace("gyro: Azimuth waypoint received, calculating... (packet: {}, way: {}, id: {}, listener: {})", packet, way, id, this);
+                    if (GYRO_LOGGER.isTraceEnabled(Gyro.GYRO_MARKER)) {
+                        GYRO_LOGGER.trace(Gyro.GYRO_MARKER, "gyro: Azimuth waypoint received, calculating... (packet: {}, way: {}, id: {}, listener: {})", packet, way, id, this);
                     }
 
                     // Get the player.
                     LocalPlayer player = this.minecraft.player;
                     if (player == null) {
                         // Log, stop. (**DEBUG**)
-                        if (!GYRO_LOGGER.isDebugEnabled()) break;
-                        GYRO_LOGGER.debug("gyro: Skipping adding Azimuth waypoint, no player found. (packet: {}, way: {}, id: {}, listener: {})", packet, way, id, this);
+                        if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) break;
+                        GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Skipping adding Azimuth waypoint, no player found. (packet: {}, way: {}, id: {}, listener: {})", packet, way, id, this);
                         break;
                     }
 
@@ -192,8 +192,8 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
                     GyroData lastData = Gyro.ANGLES.put(id, curData);
                     if ((lastData == null) || lastData.equals(curData)) {
                         // Log, stop. (**DEBUG**)
-                        if (!GYRO_LOGGER.isDebugEnabled()) break;
-                        GYRO_LOGGER.debug("gyro: Skipping adding Azimuth waypoint, last data is the same or missing. (packet: {}, way: {}, id: {}, curData: {}, lastData: {}, listener: {})", packet, way, id, curData, lastData, this);
+                        if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) break;
+                        GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Skipping adding Azimuth waypoint, last data is the same or missing. (packet: {}, way: {}, id: {}, curData: {}, lastData: {}, listener: {})", packet, way, id, curData, lastData, this);
                         break;
                     }
                     double lastYaw = lastData.angle();
@@ -214,8 +214,8 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
                     if ((x <= -Level.MAX_LEVEL_SIZE) || (z <= -Level.MAX_LEVEL_SIZE) ||
                             (x >= Level.MAX_LEVEL_SIZE) || (z >= Level.MAX_LEVEL_SIZE)) {
                         // Log, stop. (**DEBUG**)
-                        if (!GYRO_LOGGER.isDebugEnabled()) break;
-                        GYRO_LOGGER.debug("gyro: Skipping adding Azimuth waypoint, the calculated position is unrealistic. (packet: {}, way: {}, id: {}, curData: {}, lastData: {}, curInvTan: {}, lastInvTan: {}, curCross: {}, lastCross: {}, x: {}, z: {}, listener: {})", packet, way, id, curData, lastData, curInvTan, lastInvTan, curCross, lastCross, x, z, this);
+                        if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) break;
+                        GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Skipping adding Azimuth waypoint, the calculated position is unrealistic. (packet: {}, way: {}, id: {}, curData: {}, lastData: {}, curInvTan: {}, lastInvTan: {}, curCross: {}, lastCross: {}, x: {}, z: {}, listener: {})", packet, way, id, curData, lastData, curInvTan, lastInvTan, curCross, lastCross, x, z, this);
                         break;
                     }
 
@@ -226,8 +226,8 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
                     double distSqr = ((diffX * diffX) + (diffZ * diffZ));
                     if (distSqr <= 64) {
                         // Log, stop. (**DEBUG**)
-                        if (!GYRO_LOGGER.isDebugEnabled()) break;
-                        GYRO_LOGGER.debug("gyro: Skipping adding Azimuth waypoint, the calculated position is too close. (packet: {}, way: {}, id: {}, curData: {}, lastData: {}, curInvTan: {}, lastInvTan: {}, curCross: {}, lastCross: {}, x: {}, z: {}, diffX: {}, diffZ: {}, distSqr: {}, listener: {})", packet, way, id, curData, lastData, curInvTan, lastInvTan, curCross, lastCross, x, z, diffX, diffZ, distSqr, this);
+                        if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) break;
+                        GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Skipping adding Azimuth waypoint, the calculated position is too close. (packet: {}, way: {}, id: {}, curData: {}, lastData: {}, curInvTan: {}, lastInvTan: {}, curCross: {}, lastCross: {}, x: {}, z: {}, diffX: {}, diffZ: {}, distSqr: {}, listener: {})", packet, way, id, curData, lastData, curInvTan, lastInvTan, curCross, lastCross, x, z, diffX, diffZ, distSqr, this);
                         break;
                     }
 
@@ -235,15 +235,15 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
                     this.gyro_updateTrackedPosition(way, x, z, "azimuth");
 
                     // Log. (**DEBUG**)
-                    if (!GYRO_LOGGER.isDebugEnabled()) break;
-                    GYRO_LOGGER.debug("gyro: Calculated and added Azimuth waypoint. (packet: {}, way: {}, id: {}, curData: {}, lastData: {}, curInvTan: {}, lastInvTan: {}, curCross: {}, lastCross: {}, x: {}, z: {}, diffX: {}, diffZ: {}, distSqr: {}, listener: {})", packet, way, id, curData, lastData, curInvTan, lastInvTan, curCross, lastCross, x, z, diffX, diffZ, distSqr, this);
+                    if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) break;
+                    GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Calculated and added Azimuth waypoint. (packet: {}, way: {}, id: {}, curData: {}, lastData: {}, curInvTan: {}, lastInvTan: {}, curCross: {}, lastCross: {}, x: {}, z: {}, diffX: {}, diffZ: {}, distSqr: {}, listener: {})", packet, way, id, curData, lastData, curInvTan, lastInvTan, curCross, lastCross, x, z, diffX, diffZ, distSqr, this);
                 }
 
                 // This is the other type of waypoint, we should remove everything.
                 default -> {
                     // Log. (**TRACE**)
-                    if (GYRO_LOGGER.isTraceEnabled()) {
-                        GYRO_LOGGER.trace("gyro: Unknown (empty?) waypoint received, removing... (packet: {}, way: {}, id: {}, listener: {})", packet, way, id, this);
+                    if (GYRO_LOGGER.isTraceEnabled(Gyro.GYRO_MARKER)) {
+                        GYRO_LOGGER.trace(Gyro.GYRO_MARKER, "gyro: Unknown (empty?) waypoint received, removing... (packet: {}, way: {}, id: {}, listener: {})", packet, way, id, this);
                     }
 
                     // Remove.
@@ -251,8 +251,8 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
                     Gyro.RENDER_POSES.remove(id);
 
                     // Log. (**DEBUG**)
-                    if (!GYRO_LOGGER.isDebugEnabled()) break;
-                    GYRO_LOGGER.debug("gyro: Removed unknown waypoint. (packet: {}, way: {}, id: {}, listener: {})", packet, way, id, this);
+                    if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) break;
+                    GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Removed unknown waypoint. (packet: {}, way: {}, id: {}, listener: {})", packet, way, id, this);
                 }
             }
 
@@ -279,8 +279,8 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
         assert !type.isBlank() : "gyro: Invalid type. (way: " + way + ", x: " + x + ", z: " + z + ", type: " + type + ", listener: " + this + ')';
 
         // Log. (**TRACE**)
-        if (GYRO_LOGGER.isTraceEnabled()) {
-            GYRO_LOGGER.trace("gyro: Updating tracked position... (way: {}, x: {}, z: {}, type: {}, listener: {})", way, x, z, type, this);
+        if (GYRO_LOGGER.isTraceEnabled(Gyro.GYRO_MARKER)) {
+            GYRO_LOGGER.trace(Gyro.GYRO_MARKER, "gyro: Updating tracked position... (way: {}, x: {}, z: {}, type: {}, listener: {})", way, x, z, type, this);
         }
 
         // Calculate the color and put into rendering positions.
@@ -310,7 +310,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
                 .append(Component.literal(".")));
 
         // Log. (**DEBUG**)
-        if (!GYRO_LOGGER.isDebugEnabled()) return;
-        GYRO_LOGGER.debug("gyro: Updated tracker position. (way: {}, x: {}, z: {}, type: {}, id: {}, color: {}, either: {}, name: {}, listener: {})", way, x, z, type, id, color, either, name, this);
+        if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) return;
+        GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Updated tracker position. (way: {}, x: {}, z: {}, type: {}, id: {}, color: {}, either: {}, name: {}, listener: {})", way, x, z, type, id, color, either, name, this);
     }
 }
