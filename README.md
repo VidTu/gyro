@@ -8,7 +8,8 @@ Abuses the newly introduced (1.21.6) Minecraft waypoint system to get player pos
 
 ## Dependencies
 
-This mod has _no dependencies_, besides the loader and the game, you'll need:
+This mod has _no dependencies_, besides the loader and the game.
+You'll need:
 
 - Fabric Loader (>=0.16.13)
 - Minecraft (25w17a)
