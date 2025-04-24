@@ -114,13 +114,6 @@ tasks.withType<ProcessResources> {
     filesMatching("fabric.mod.json") {
         expand(inputs.properties)
     }
-    fileTree(outputs.files.asPath).forEach {
-        if (it.name.endsWith(".json")) {
-            doLast {
-                it.writeText(Gson().fromJson(it.readText(), JsonElement::class.java).toString())
-            }
-        }
-    }
 }
 
 tasks.withType<AbstractArchiveTask> {
@@ -146,6 +139,7 @@ tasks.withType<RemapJarTask> {
     val minifier = UnsafeUnaryOperator<String> { Gson().fromJson(it, JsonElement::class.java).toString() }
     doLast {
         ZipUtils.transformString(archiveFile.get().asFile.toPath(), mapOf(
+            "fabric.mod.json" to minifier,
             "gyro.mixins.json" to minifier,
             "gyro.mixins.refmap.json" to minifier,
         ))
