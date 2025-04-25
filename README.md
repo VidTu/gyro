@@ -88,12 +88,46 @@ Beware: This mod may be considered a hack by some people.
 This project is provided under the MIT License.
 Check out [LICENSE](https://github.com/VidTu/gyro/blob/main/LICENSE) for more information.
 
-## Building
+## Development
+
+### Building (Compiling)
+
+To compile the mod from the source code:
 
 1. Have 4 GB of free RAM, 10 GB of free disk space, and an active internet connection.
 2. Install Java 21 and dump it into PATH and/or JAVA_HOME.
 3. Run `./gradlew build` from the terminal/PowerShell.
 4. Grab the JAR from the `./build/libs/` folder.
+
+### Developing/Debugging
+
+Run the `./gradlew runClient` command to launch the game client. You can attach a debugger to that process.
+Hotswap is supported. "Enhanced" hotswap (class redefinition) and hotswap agent will work if supported by your JVM.
+
+Running the client via generated tasks (e.g. for IntelliJ IDEA) may work, but you might need to make some adjustments
+to the "VM arguments" field to make it work properly (i.e., remove the `-Dline.separator=\n` argument, if your
+IDE can't render newlines). Launching the game directly (without Gradle) might also work, but it is also not supported.
+
+The development environment has stricter preconditions: Mixin checks, Netty detector, Java assertions, etc.
+Code with bugs might (and probably will) fail faster here than in a production environment.
+
+The recommended IDE for development is IntelliJ IDEA (Community or Ultimate) with the Minecraft Development plugin.
+This is not a strict requirement, however. Any IDE/editor should work just fine.
+
+### Reproducible Builds
+
+gyro attempts to have reproducible builds (reproducible JAR archives) for its releases. Check out
+[GitHub Releases](https://github.com/VidTu/gyro/releases) for "Reproducible Build Hash" values. If it is present
+on any release, this release's binary JAR should be reproducible. Unfortunately, due to the nature of Java
+(Gradle) and Minecraft development, it is not always possible to have reproducible builds.
+Reproducible release JARs are compiled with: (use these commands to create a reproducible build)
+
+```bash
+./gradlew clean --no-daemon --no-build-cache --no-configuration-cache
+./gradlew build --no-daemon --no-build-cache --no-configuration-cache
+```
+
+Currently, no dependency (integrity) validation is performed. This might change in a future version.
 
 [^1]: Not yet confirmed to be 1.21.6.
 
