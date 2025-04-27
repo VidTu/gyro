@@ -30,6 +30,7 @@ import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.FogRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -75,6 +76,13 @@ public class LevelRendererMixin {
     private static final ResourceLocation GYRO_BEACON_BEAM = ResourceLocation.withDefaultNamespace("textures/entity/beacon_beam.png");
 
     /**
+     * Game instance.
+     */
+    @Shadow
+    @Final
+    private final Minecraft minecraft = Minecraft.getInstance();
+
+    /**
      * Current level, used to retrieve game time, which is basically useless for our needs but is an argument for
      * beacon beam renderer by convention even tho our beams are eternal. It's probably for animation too, not tested.
      *
@@ -100,7 +108,7 @@ public class LevelRendererMixin {
      */
     @Deprecated(forRemoval = true)
     @Contract(value = "-> fail", pure = true)
-    public LevelRendererMixin() {
+    private LevelRendererMixin() {
         throw new AssertionError("No instances.");
     }
 
@@ -124,6 +132,7 @@ public class LevelRendererMixin {
         assert blockBreakAnimSource != null : "gyro: Parameter 'blockBreakAnimSource' is null. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", tickDelta: " + tickDelta + ", renderer: " + this + ')';
         assert camera != null : "gyro: Parameter 'camera' is null. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", tickDelta: " + tickDelta + ", renderer: " + this + ')';
         assert (tickDelta >= 0.0F) && (tickDelta <= 1.0F) : "gyro: Parameter 'tickDelta' is not in the [0..1] range. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", tickDelta: " + tickDelta + ", renderer: " + this + ')';
+        assert this.minecraft.isSameThread() : "gyro: Rendering block entities NOT from the main thread. (thread: " + Thread.currentThread() + ", pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", tickDelta: " + tickDelta + ", renderer: " + this + ')';
 
         // Get and push the profiler.
         ProfilerFiller profiler = Profiler.get();

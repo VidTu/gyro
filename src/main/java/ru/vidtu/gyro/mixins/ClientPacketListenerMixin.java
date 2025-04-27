@@ -140,7 +140,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 
                     // Extract the position and send the message.
                     Vec3i vector = ((Vec3iWaypointAccessor) vec).gyro_vector();
-                    this.gyro_updateTrackedPosition(way, vector.getX(), vector.getZ(), "vec3i");
+                    this.gyro_updateTrackedPosition(way, vector.getX(), vector.getZ(), "vector");
 
                     // Log. (**DEBUG**)
                     if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) break;
@@ -277,6 +277,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
         assert (z >= -Level.MAX_LEVEL_SIZE) && (z <= Level.MAX_LEVEL_SIZE) : "gyro: Parameter 'z' is not in the [-30_000_000..30_000_000] range. (way: " + way + ", x: " + x + ", z: " + z + ", type: " + type + ", listener: " + this + ')';
         assert type != null : "gyro: Parameter 'type' is null. (way: " + way + ", x: " + x + ", z: " + z + ", listener: " + this + ')';
         assert !type.isBlank() : "gyro: Invalid type. (way: " + way + ", x: " + x + ", z: " + z + ", type: " + type + ", listener: " + this + ')';
+        assert this.minecraft.isSameThread() : "gyro: Updating tracked position NOT from the main thread. (thread: " + Thread.currentThread() + ", way: " + way + ", x: " + x + ", z: " + z + ", type: " + type + ", listener: " + this + ')';
 
         // Log. (**TRACE**)
         if (GYRO_LOGGER.isTraceEnabled(Gyro.GYRO_MARKER)) {
@@ -293,21 +294,17 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 
         // Send the message.
         String either = id.right().orElseGet(() -> id.orThrow().toString());
-        String name = id.left()
+        Component name = id.left()
                 .map(this.playerInfoMap::get)
-                .map(info -> info.getProfile().getName())
-                .orElse("<no player found>");
-        this.minecraft.gui.getChat().addMessage(Component.literal("Entity ")
-                .append(Component.literal(either).withStyle(ChatFormatting.GREEN))
-                .append(Component.literal(" assigned to player "))
-                .append(Component.literal(name).withStyle(ChatFormatting.GREEN))
-                .append(Component.literal(" found at "))
-                .append(Component.literal(String.format("%.1f", x)).withStyle(ChatFormatting.GREEN))
-                .append(Component.literal(" / "))
-                .append(Component.literal(String.format("%.1f", z)).withStyle(ChatFormatting.GREEN))
-                .append(Component.literal(" via "))
-                .append(Component.literal(type).withStyle(ChatFormatting.GREEN)) // Implicit NPE for 'type'
-                .append(Component.literal(".")));
+                .map(info -> Component.literal(info.getProfile().getName()).withStyle(ChatFormatting.GREEN))
+                .orElseGet(() -> Component.translatableWithFallback("gyro.nonplayer", "<no player found>").withStyle(ChatFormatting.YELLOW));
+        this.minecraft.gui.getChat().addMessage(Component.translatableWithFallback("gyro.found",
+                "Entity %s (assigned to player %s) found at %s / %s via %s.",
+                Component.literal(either).withStyle(ChatFormatting.GREEN),
+                name,
+                Component.literal("%.1f".formatted(x)).withStyle(ChatFormatting.GREEN),
+                Component.literal("%.1f".formatted(z)).withStyle(ChatFormatting.GREEN),
+                Component.translatableWithFallback("gyro." + type, type).withStyle(ChatFormatting.GREEN)));
 
         // Log. (**DEBUG**)
         if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) return;

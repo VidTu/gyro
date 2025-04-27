@@ -30,6 +30,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.util.profiling.Profiler;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.util.thread.ReentrantBlockableEventLoop;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
@@ -51,7 +52,7 @@ import ru.vidtu.gyro.Gyro;
 // @ApiStatus.Internal // Can't annotate this without logging in the console.
 @Mixin(Minecraft.class)
 @NullMarked
-public final class MinecraftMixin {
+public abstract class MinecraftMixin extends ReentrantBlockableEventLoop<Runnable> {
     /**
      * Logger for this class.
      */
@@ -66,7 +67,8 @@ public final class MinecraftMixin {
      */
     @Deprecated(forRemoval = true)
     @Contract(value = "-> fail", pure = true)
-    public MinecraftMixin() {
+    private MinecraftMixin() {
+        super(null);
         throw new AssertionError("No instances.");
     }
 
@@ -78,6 +80,9 @@ public final class MinecraftMixin {
      */
     @Inject(method = "updateLevelInEngines", at = @At("RETURN"))
     private void gyro_updateLevelInEngines_return(@Nullable ClientLevel level, CallbackInfo ci) {
+        // Validate.
+        assert this.isSameThread() : "gyro: Updating level in engines NOT from the main thread. (thread: " + Thread.currentThread() + ", level: " + level + ", game: " + this + ')';
+
         // Get and push the profiler.
         ProfilerFiller profiler = Profiler.get();
         profiler.push("gyro:clear_data");

@@ -8,13 +8,14 @@ Abuses the newly introduced (1.21.6) Minecraft waypoint system to get player pos
 
 ## Dependencies
 
-This mod has _no dependencies_, besides the loader and the game.
+This mod has _no required dependencies_, besides the loader and the game.
 You'll need:
 
 - Fabric Loader (>=0.16.13)
 - Minecraft (25w17a)
+- Optional: Fabric API ("Fabric Resource Loader" module)
 
-Fabric API is **NOT** required.
+Fabric API is **NOT** required, but you can install it for localization support.
 
 ## About
 
@@ -58,7 +59,7 @@ You'll need a GitHub account to download these.
 **A**: Minecraft 25w17a. (a snapshot for 1.21.6[^1])
 
 **Q**: Do I need to install Fabric API or Quilt Standard Libraries?  
-**A**: No, but you can install these for other mods.
+**A**: No, but you can install these for other mods and/or localization support.
 
 **Q**: Is this mod open source?  
 **A**: [Yes.](https://github.com/VidTu/gyro) (Licensed

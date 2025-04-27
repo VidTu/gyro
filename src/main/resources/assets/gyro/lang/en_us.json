@@ -1,0 +1,7 @@
+{
+  "gyro.found": "Entity %s (assigned to player %s) found at %.1f / %.1f via %s.",
+  "gyro.nonplayer": "<no player found>",
+  "gyro.azimuth": "azimuth",
+  "gyro.chunk": "chunk",
+  "gyro.vector": "vector"
+}

@@ -2481,12 +2481,12 @@
     <inspection_tool class="StringBufferMustHaveInitialCapacity" enabled="true" level="ERROR" enabled_by_default="true" editorAttributes="ERRORS_ATTRIBUTES" />
     <inspection_tool class="StringBufferReplaceableByString" enabled="true" level="ERROR" enabled_by_default="true" editorAttributes="ERRORS_ATTRIBUTES" />
     <inspection_tool class="StringBufferReplaceableByStringBuilder" enabled="true" level="ERROR" enabled_by_default="true" editorAttributes="ERRORS_ATTRIBUTES" />
-    <inspection_tool class="StringConcatenation" enabled="true" level="ERROR" enabled_by_default="true" editorAttributes="ERRORS_ATTRIBUTES">
+    <inspection_tool class="StringConcatenation" enabled="true" level="INFORMATION" enabled_by_default="true" editorAttributes="INFORMATION_ATTRIBUTES">
       <option name="ignoreAsserts" value="true" />
-      <option name="ignoreSystemOuts" value="false" />
-      <option name="ignoreSystemErrs" value="false" />
-      <option name="ignoreThrowableArguments" value="false" />
-      <option name="ignoreConstantInitializers" value="false" />
+      <option name="ignoreSystemOuts" value="true" />
+      <option name="ignoreSystemErrs" value="true" />
+      <option name="ignoreThrowableArguments" value="true" />
+      <option name="ignoreConstantInitializers" value="true" />
       <option name="ignoreInTestCode" value="false" />
       <option name="ignoreInToString" value="true" />
     </inspection_tool>

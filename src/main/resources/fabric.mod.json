@@ -29,6 +29,9 @@
   "depends": {
     "minecraft": "1.21.6-alpha.25.17.a"
   },
+  "recommends": {
+    "fabric-resource-loader-v0": "*"
+  },
   "custom": {
     "modmenu": {
       "links": {

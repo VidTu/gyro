@@ -61,7 +61,7 @@ loom {
             "-ea",
             "-esa",
             "-Dmixin.debug=true",
-            "-Dmixin.debug.strict=true",
+            "-Dmixin.debug.strict.unique=true",
             "-Dmixin.checks=true",
             "-Dio.netty.tryReflectionSetAccessible=true",
             "-Dio.netty.leakDetection.level=PARANOID",
@@ -101,6 +101,7 @@ dependencies {
 
     // Fabric
     modImplementation(libs.fabric.loader)
+    modRuntimeOnly(fabricApi.module("fabric-resource-loader-v0", libs.fabric.api.get().version))
 }
 
 tasks.withType<JavaCompile> {
@@ -113,6 +114,14 @@ tasks.withType<ProcessResources> {
     inputs.property("version", version)
     filesMatching("fabric.mod.json") {
         expand(inputs.properties)
+    }
+    val files = fileTree(outputs.files.asPath)
+    doLast {
+        files.forEach {
+            if (it.name.endsWith(".json", ignoreCase = true)) {
+                it.writeText(Gson().fromJson(it.readText(), JsonElement::class.java).toString())
+            }
+        }
     }
 }
 
@@ -139,7 +148,6 @@ tasks.withType<RemapJarTask> {
     val minifier = UnsafeUnaryOperator<String> { Gson().fromJson(it, JsonElement::class.java).toString() }
     doLast {
         ZipUtils.transformString(archiveFile.get().asFile.toPath(), mapOf(
-            "fabric.mod.json" to minifier,
             "gyro.mixins.json" to minifier,
             "gyro.mixins.refmap.json" to minifier,
         ))
