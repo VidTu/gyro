@@ -34,7 +34,7 @@ minecraft = "25w17a"
 architectury-loom = { id = "dev.architectury.loom", version.ref = "architectury-loom" }
 
 [libraries]
-fabric-api = { module = "net.fabricmc:fabric-api", version.ref = "fabric-api" }
+fabric-api = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric-api" }
 fabric-loader = { module = "net.fabricmc:fabric-loader", version.ref = "fabric-loader" }
 jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains-annotations" }
 jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
