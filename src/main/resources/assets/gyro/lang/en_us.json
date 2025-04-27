@@ -3,5 +3,7 @@
   "gyro.nonplayer": "<no player found>",
   "gyro.azimuth": "azimuth",
   "gyro.chunk": "chunk",
-  "gyro.vector": "vector"
+  "gyro.vector": "vector",
+  "modmenu.descriptionTranslation.modmenu": "Abuses the newly introduced (1.21.6) Minecraft waypoint system to get player positions.",
+  "modmenu.summaryTranslation.modmenu": "Gets player positions via player locator."
 }

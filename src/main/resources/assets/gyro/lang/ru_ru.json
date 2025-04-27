@@ -3,5 +3,7 @@
   "gyro.nonplayer": "<игрок не найден>",
   "gyro.azimuth": "азимут",
   "gyro.chunk": "чанк",
-  "gyro.vector": "вектор"
+  "gyro.vector": "вектор",
+  "modmenu.descriptionTranslation.modmenu": "Использует новую (1.21.6) систему маячков в Minecraft для получения позиций игроков.",
+  "modmenu.summaryTranslation.modmenu": "Получает позиции игроков через локатор игроков."
 }
