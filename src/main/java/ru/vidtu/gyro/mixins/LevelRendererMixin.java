@@ -80,7 +80,7 @@ public class LevelRendererMixin {
      */
     @Shadow
     @Final
-    private final Minecraft minecraft = Minecraft.getInstance();
+    private final Minecraft minecraft;
 
     /**
      * Current level, used to retrieve game time, which is basically useless for our needs but is an argument for
@@ -98,7 +98,7 @@ public class LevelRendererMixin {
      */
     @Shadow
     @Final
-    private FogRenderer fogRenderer;
+    private final FogRenderer fogRenderer;
 
     /**
      * An instance of this class cannot be created.

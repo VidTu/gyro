@@ -83,7 +83,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
      */
     @Shadow
     @Final
-    private Map<UUID, PlayerInfo> playerInfoMap;
+    private final Map<UUID, PlayerInfo> playerInfoMap;
 
     /**
      * An instance of this class cannot be created.

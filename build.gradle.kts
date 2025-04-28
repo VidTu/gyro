@@ -57,6 +57,9 @@ loom {
             // Force UNIX newlines.
             "-Dline.separator=\n",
 
+            // Force datafixers not to do our CPU.
+            "-Dmax.bg.threads=1",
+
             // Debug arguments.
             "-ea",
             "-esa",
