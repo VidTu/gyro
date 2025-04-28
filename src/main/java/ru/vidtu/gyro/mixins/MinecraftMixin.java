@@ -69,7 +69,7 @@ public abstract class MinecraftMixin extends ReentrantBlockableEventLoop<Runnabl
     @Contract(value = "-> fail", pure = true)
     private MinecraftMixin() {
         super(null);
-        throw new AssertionError("No instances.");
+        throw new AssertionError("gyro: No instances.");
     }
 
     /**

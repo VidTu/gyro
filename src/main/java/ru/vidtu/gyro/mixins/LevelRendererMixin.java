@@ -109,7 +109,7 @@ public class LevelRendererMixin {
     @Deprecated(forRemoval = true)
     @Contract(value = "-> fail", pure = true)
     private LevelRendererMixin() {
-        throw new AssertionError("No instances.");
+        throw new AssertionError("gyro: No instances.");
     }
 
     /**

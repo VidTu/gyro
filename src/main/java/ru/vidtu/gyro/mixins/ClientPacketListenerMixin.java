@@ -96,7 +96,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
     @Contract(value = "-> fail", pure = true)
     private ClientPacketListenerMixin() {
         super(null, null, null);
-        throw new AssertionError("No instances.");
+        throw new AssertionError("gyro: No instances.");
     }
 
     /**
