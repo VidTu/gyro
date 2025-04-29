@@ -29,6 +29,7 @@ package ru.vidtu.gyro.mixins;
 import com.mojang.datafixers.util.Either;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.multiplayer.ClientCommonPacketListenerImpl;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.player.LocalPlayer;
@@ -38,11 +39,13 @@ import net.minecraft.network.protocol.game.ClientboundTrackedWaypointPacket;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.profiling.Profiler;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.waypoints.TrackedWaypoint;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.Final;
@@ -86,6 +89,13 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
     @Shadow
     @Final
     private final Map<UUID, PlayerInfo> playerInfoMap;
+
+    /**
+     * Current level, {@code null} if none.
+     */
+    @Shadow
+    @Nullable
+    private ClientLevel level;
 
     /**
      * An instance of this class cannot be created.
@@ -297,21 +307,28 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
         Gyro.RENDER_POSES.put(id, new GyroRender(x, z, color));
 
         // Send the message.
+        ClientLevel level = this.level;
         String either = id.right().orElseGet(() -> id.orThrow().toString());
-        Component name = id.left()
+        Component player = id.left()
                 .map(this.playerInfoMap::get)
                 .map(info -> Component.literal(info.getProfile().getName()).withStyle(ChatFormatting.GREEN))
-                .orElseGet(() -> Component.translatableWithFallback("gyro.nonplayer", "<no player found>").withStyle(ChatFormatting.YELLOW));
+                .orElseGet(() -> Component.translatableWithFallback("gyro.null.player", "<not found>").withStyle(ChatFormatting.YELLOW));
+        Component entity = id.left()
+                .map(uuid -> (level != null) ? level.getEntity(uuid) : null)
+                .map(Entity::getDisplayName)
+                .map(name -> name.copy().withStyle(ChatFormatting.GREEN))
+                .orElseGet(() -> Component.translatableWithFallback("gyro.null.entity", "<not found>").withStyle(ChatFormatting.YELLOW));
         this.minecraft.gui.getChat().addMessage(Component.translatableWithFallback("gyro.found",
-                "Entity %s (assigned to player %s) found at %s / %s via %s.",
+                "Waypoint %s (player: %s, entity: %s) found at %s / %s via %s.",
                 Component.literal(either).withStyle(ChatFormatting.GREEN),
-                name,
+                player,
+                entity,
                 Component.literal("%.1f".formatted(x)).withStyle(ChatFormatting.GREEN),
                 Component.literal("%.1f".formatted(z)).withStyle(ChatFormatting.GREEN),
-                Component.translatableWithFallback("gyro." + type, type).withStyle(ChatFormatting.GREEN)));
+                Component.translatableWithFallback("gyro.found." + type, type).withStyle(ChatFormatting.GREEN)));
 
         // Log. (**DEBUG**)
         if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) return;
-        GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Updated tracker position. (way: {}, x: {}, z: {}, type: {}, id: {}, color: {}, either: {}, name: {}, listener: {})", way, x, z, type, id, color, either, name, this);
+        GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Updated tracker position. (way: {}, x: {}, z: {}, type: {}, id: {}, color: {}, either: {}, player: {}, entity: {}, listener: {})", way, x, z, type, id, color, either, player, entity, this);
     }
 }

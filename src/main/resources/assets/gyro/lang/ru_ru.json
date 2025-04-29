@@ -1,9 +1,13 @@
 {
-  "gyro.found": "Сущность %s (привязанная к игроку %s) найдена на %.1f / %.1f через %s.",
-  "gyro.nonplayer": "<игрок не найден>",
-  "gyro.azimuth": "азимут",
-  "gyro.chunk": "чанк",
-  "gyro.vector": "вектор",
+  "gyro.found": "Маячок %s (игрок: %s, сущность: %s) найден на %s / %s через %s.",
+  "gyro.found.azimuth": "азимут",
+  "gyro.found.chunk": "чанк",
+  "gyro.found.vector": "вектор",
+  "gyro.status.azimuth": "Получен маячок-азимут %s (игрок: %s, сущность: %s) с градусом %s.",
+  "gyro.status.chunk": "Получен маячок-чанк %s (игрок: %s, сущность: %s) с локацией %s / %s.",
+  "gyro.status.vector": "Получен маячок-вектор %s (игрок: %s, сущность: %s) с позицией %s / %s / %s.",
+  "gyro.null.player": "<не найден>",
+  "gyro.null.entity": "<не найдена>",
   "modmenu.descriptionTranslation.modmenu": "Использует новую (1.21.6) систему маячков в Minecraft для получения позиций игроков.",
   "modmenu.summaryTranslation.modmenu": "Получает позиции игроков через локатор игроков."
 }
