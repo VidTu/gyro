@@ -216,9 +216,9 @@
     <inspection_tool class="CastCanBeReplacedWithVariable" enabled="true" level="ERROR" enabled_by_default="true" editorAttributes="ERRORS_ATTRIBUTES" />
     <inspection_tool class="CastConflictsWithInstanceof" enabled="true" level="ERROR" enabled_by_default="true" editorAttributes="ERRORS_ATTRIBUTES" />
     <inspection_tool class="CastDueToProgressionResolutionChangeMigration" enabled="true" level="ERROR" enabled_by_default="true" editorAttributes="ERRORS_ATTRIBUTES" />
-    <inspection_tool class="CastThatLosesPrecision" enabled="true" level="ERROR" enabled_by_default="true" editorAttributes="ERRORS_ATTRIBUTES">
-      <option name="ignoreIntegerCharCasts" value="false" />
-      <option name="ignoreOverflowingByteCasts" value="false" />
+    <inspection_tool class="CastThatLosesPrecision" enabled="true" level="INFORMATION" enabled_by_default="true" editorAttributes="INFORMATION_ATTRIBUTES">
+      <option name="ignoreIntegerCharCasts" value="true" />
+      <option name="ignoreOverflowingByteCasts" value="true" />
     </inspection_tool>
     <inspection_tool class="CastToIncompatibleInterface" enabled="true" level="INFORMATION" enabled_by_default="true" editorAttributes="INFORMATION_ATTRIBUTES" />
     <inspection_tool class="CatchMayIgnoreException" enabled="true" level="ERROR" enabled_by_default="true" editorAttributes="ERRORS_ATTRIBUTES" />

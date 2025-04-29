@@ -47,7 +47,6 @@ import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -67,16 +66,9 @@ import java.util.Collection;
 @NullMarked
 public class LevelRendererMixin {
     /**
-     * A beacon beam texture.
+     * Game instance. Used for thread checking.
      *
-     * @see BeaconRenderer
-     * @see BeaconRenderer#renderBeaconBeam(PoseStack, MultiBufferSource, ResourceLocation, float, float, long, int, int, int, float, float)
-     */
-    @Unique
-    private static final ResourceLocation GYRO_BEACON_BEAM = ResourceLocation.withDefaultNamespace("textures/entity/beacon_beam.png");
-
-    /**
-     * Game instance.
+     * @see #gyro_renderBlockEntities_return(PoseStack, MultiBufferSource.BufferSource, MultiBufferSource.BufferSource, Camera, float, CallbackInfo)
      */
     @Shadow
     @Final
@@ -86,6 +78,7 @@ public class LevelRendererMixin {
      * Current level, used to retrieve game time, which is basically useless for our needs but is an argument for
      * beacon beam renderer by convention even tho our beams are eternal. It's probably for animation too, not tested.
      *
+     * @see #gyro_renderBlockEntities_return(PoseStack, MultiBufferSource.BufferSource, MultiBufferSource.BufferSource, Camera, float, CallbackInfo)
      * @see Level#getGameTime()
      * @see BeaconRenderer#renderBeaconBeam(PoseStack, MultiBufferSource, ResourceLocation, float, float, long, int, int, int, float, float)
      */
@@ -94,7 +87,7 @@ public class LevelRendererMixin {
     private ClientLevel level;
 
     /**
-     * Fog renderer implementation.
+     * Fog renderer implementation. Used to disable and re-enable the fog.
      */
     @Shadow
     @Final
@@ -121,6 +114,9 @@ public class LevelRendererMixin {
      * @param camera               Current camera data
      * @param tickDelta            Current tick data
      * @param ci                   Callback data, ignored
+     * @see BeaconRenderer#BEAM_LOCATION
+     * @see BeaconRenderer#renderBeaconBeam(PoseStack, MultiBufferSource, ResourceLocation, float, float, long, int, int, int, float, float)
+     * @see Gyro#RENDER_POSES
      */
     @Inject(method = "renderBlockEntities", at = @At("RETURN"))
     private void gyro_renderBlockEntities_return(PoseStack pose, MultiBufferSource.BufferSource source,
@@ -150,10 +146,10 @@ public class LevelRendererMixin {
         GpuBufferSlice fog = RenderSystem.getShaderFog();
         RenderSystem.setShaderFog(this.fogRenderer.getBuffer(FogRenderer.FogMode.NONE));
 
-        // Get the camera position and offset by it.
+        // Get the camera position.
         Vec3 cam = camera.getPosition(); // Implicit NPE for 'camera'
-        pose.pushPose(); // Implicit NPE for 'pose'
-        pose.translate(-cam.x(), 0.0D, -cam.z());
+        double cx = cam.x();
+        double cz = cam.z();
 
         // Extract the level.
         ClientLevel level = this.level;
@@ -161,14 +157,19 @@ public class LevelRendererMixin {
 
         // Render each pos as a beam.
         for (GyroRender pos : poses) {
-            pose.pushPose();
-            pose.translate(pos.x(), 0.0D, pos.z());
-            BeaconRenderer.renderBeaconBeam(pose, source, GYRO_BEACON_BEAM, tickDelta, /*scale=*/1.0F, level.getGameTime(), /*verticalOffset=*/-1024, /*beamHeight=*/2048, pos.color(), /*solidSize=*/0.15F, /*transparentSize=*/0.175F); // Implicit NPE for 'source', 'level'
+            // Push and offset.
+            pose.pushPose(); // Implicit NPE for 'pose'
+            double x = (pos.x() - cx);
+            double z = (pos.z() - cz);
+            pose.translate(x, 0.0D, z);
+
+            // Scale and render.
+            float scale = Math.max(1.0F, (float) (Math.sqrt((x * x) + (z * z)) / 48.0D));
+            BeaconRenderer.renderBeaconBeam(pose, source, BeaconRenderer.BEAM_LOCATION, tickDelta, /*textureDensity=*/1.0F, level.getGameTime(), -(BeaconRenderer.MAX_RENDER_Y / 2), BeaconRenderer.MAX_RENDER_Y, pos.color(), BeaconRenderer.SOLID_BEAM_RADIUS * scale, BeaconRenderer.BEAM_GLOW_RADIUS * scale); // Implicit NPE for 'source', 'level'
+
+            // Pop.
             pose.popPose();
         }
-
-        // Pop the stack from camera offsetting.
-        pose.popPose();
 
         // Re-enable the fog.
         RenderSystem.setShaderFog(fog);
