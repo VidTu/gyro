@@ -32,7 +32,6 @@ import net.minecraft.client.multiplayer.ClientCommonPacketListenerImpl;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.PlayerInfo;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundTrackedWaypointPacket;
@@ -82,6 +81,22 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
      */
     @Unique
     private static final Logger GYRO_LOGGER = LoggerFactory.getLogger("gyro/ClientPacketListenerMixin");
+
+    /**
+     * A "not found" component for {@link #gyro_waypointPlayerInfo(TrackedWaypoint)}.
+     *
+     * @see #gyro_waypointPlayerInfo(TrackedWaypoint)
+     */
+    @Unique
+    private static final Component GYRO_NULL_PLAYER = Component.translatableWithFallback("gyro.null.player", "<not found>").withStyle(ChatFormatting.YELLOW);
+
+    /**
+     * A "not found" component for {@link #gyro_waypointEntityInfo(TrackedWaypoint)}.
+     *
+     * @see #gyro_waypointEntityInfo(TrackedWaypoint)
+     */
+    @Unique
+    private static final Component GYRO_NULL_ENTITY = Component.translatableWithFallback("gyro.null.entity", "<not found>").withStyle(ChatFormatting.YELLOW);
 
     /**
      * Player lookup map used in {@link #gyro_updateTrackedPosition(TrackedWaypoint, double, double, String)}.
@@ -138,141 +153,251 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 
             // Extract the data.
             TrackedWaypoint way = packet.waypoint(); // Implicit NPE for 'packet'
-            Either<UUID, String> id = way.id();
 
             // Depend the action on the waypoint type.
             switch (way) {
                 // Vector waypoints basically contain the whole position. Yummy!
-                case TrackedWaypoint.Vec3iWaypoint vec -> {
-                    // Log. (**TRACE**)
-                    if (GYRO_LOGGER.isTraceEnabled(Gyro.GYRO_MARKER)) {
-                        GYRO_LOGGER.trace(Gyro.GYRO_MARKER, "gyro: Vec3i waypoint received, adding... (packet: {}, way: {}, id: {}, listener: {})", packet, way, id, this);
-                    }
-
-                    // Clear the angles data.
-                    Gyro.ANGLES.remove(id);
-
-                    // Extract the position and send the message.
-                    Vec3i vector = ((Vec3iWaypointAccessor) vec).gyro_vector();
-                    this.gyro_updateTrackedPosition(way, vector.getX(), vector.getZ(), "vector");
-
-                    // Log. (**DEBUG**)
-                    if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) break;
-                    GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Added Vec3i waypoint. (packet: {}, way: {}, id: {}, vector: {}, listener: {})", packet, way, id, vector, this);
-                }
+                case TrackedWaypoint.Vec3iWaypoint vec -> this.gyro_handleVectorWaypoint(vec);
 
                 // Chunk waypoint contain the chunk middle position. We'll use the chunk center, no better alternative.
-                case TrackedWaypoint.ChunkWaypoint chunk -> {
-                    // Log. (**TRACE**)
-                    if (GYRO_LOGGER.isTraceEnabled(Gyro.GYRO_MARKER)) {
-                        GYRO_LOGGER.trace(Gyro.GYRO_MARKER, "gyro: Chunk waypoint received, adding... (packet: {}, way: {}, id: {}, listener: {})", packet, way, id, this);
-                    }
-
-                    // Clear the angles data.
-                    Gyro.ANGLES.remove(id);
-
-                    // Extract the position and send the message.
-                    ChunkPos pos = ((ChunkWaypointAccessor) chunk).gyro_chunkPos();
-                    this.gyro_updateTrackedPosition(way, pos.getMiddleBlockX(), pos.getMiddleBlockZ(), "chunk");
-
-                    // Log. (**DEBUG**)
-                    if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) break;
-                    GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Added Chunk waypoint. (packet: {}, way: {}, id: {}, pos: {}, listener: {})", packet, way, id, pos, this);
-                }
+                case TrackedWaypoint.ChunkWaypoint chunk -> this.gyro_handleChunkWaypoint(chunk);
 
                 // This is the azimuth/yaw/yRot waypoint. We assume that player stands still and calculate the position.
-                case TrackedWaypoint.AzimuthWaypoint azimuth -> {
-                    // Log. (**TRACE**)
-                    if (GYRO_LOGGER.isTraceEnabled(Gyro.GYRO_MARKER)) {
-                        GYRO_LOGGER.trace(Gyro.GYRO_MARKER, "gyro: Azimuth waypoint received, calculating... (packet: {}, way: {}, id: {}, listener: {})", packet, way, id, this);
-                    }
-
-                    // Get the player.
-                    LocalPlayer player = this.minecraft.player;
-                    if (player == null) {
-                        // Log, stop. (**DEBUG**)
-                        if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) break;
-                        GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Skipping adding Azimuth waypoint, no player found. (packet: {}, way: {}, id: {}, listener: {})", packet, way, id, this);
-                        break;
-                    }
-
-                    // Capture the current state.
-                    float curYaw = ((AzimuthWaypointAccessor) azimuth).gyro_angle();
-                    double curX = player.getX();
-                    double curZ = player.getZ();
-                    GyroData curData = new GyroData(curYaw, curX, curZ);
-
-                    // Get the last data, skip if no last data or equal to current data.
-                    GyroData lastData = Gyro.ANGLES.put(id, curData);
-                    if ((lastData == null) || lastData.equals(curData)) {
-                        // Log, stop. (**DEBUG**)
-                        if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) break;
-                        GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Skipping adding Azimuth waypoint, last data is the same or missing. (packet: {}, way: {}, id: {}, curData: {}, lastData: {}, listener: {})", packet, way, id, curData, lastData, this);
-                        break;
-                    }
-                    double lastYaw = lastData.angle();
-                    double lastX = lastData.x();
-                    double lastZ = lastData.z();
-
-                    // Calculate the tangents to the player.
-                    double curInvTan = (-1.0D / Math.tan(curYaw));
-                    double lastInvTan = (-1.0D / Math.tan(lastYaw));
-                    double curCross = (curZ - (curX * curInvTan));
-                    double lastCross = (lastZ - (lastX * lastInvTan));
-
-                    // Calculate the position based on tangents cross-point.
-                    double x = ((lastCross - curCross) / (curInvTan - lastInvTan));
-                    double z = ((x * curInvTan) + curCross);
-
-                    // If the position is unrealistic, the other player is probably moving.
-                    if ((x <= -Level.MAX_LEVEL_SIZE) || (z <= -Level.MAX_LEVEL_SIZE) ||
-                            (x >= Level.MAX_LEVEL_SIZE) || (z >= Level.MAX_LEVEL_SIZE)) {
-                        // Log, stop. (**DEBUG**)
-                        if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) break;
-                        GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Skipping adding Azimuth waypoint, the calculated position is unrealistic. (packet: {}, way: {}, id: {}, curData: {}, lastData: {}, curInvTan: {}, lastInvTan: {}, curCross: {}, lastCross: {}, x: {}, z: {}, listener: {})", packet, way, id, curData, lastData, curInvTan, lastInvTan, curCross, lastCross, x, z, this);
-                        break;
-                    }
-
-                    // Calculate the Euclidean distance and ignore if it's too close.
-                    // This is a hack for moving player that forces THEM to recalculate OUR position.
-                    double diffX = (curX - x);
-                    double diffZ = (curZ - z);
-                    double distSqr = ((diffX * diffX) + (diffZ * diffZ));
-                    if (distSqr <= (8 * 8)) {
-                        // Log, stop. (**DEBUG**)
-                        if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) break;
-                        GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Skipping adding Azimuth waypoint, the calculated position is too close. (packet: {}, way: {}, id: {}, curData: {}, lastData: {}, curInvTan: {}, lastInvTan: {}, curCross: {}, lastCross: {}, x: {}, z: {}, diffX: {}, diffZ: {}, distSqr: {}, listener: {})", packet, way, id, curData, lastData, curInvTan, lastInvTan, curCross, lastCross, x, z, diffX, diffZ, distSqr, this);
-                        break;
-                    }
-
-                    // Send the message.
-                    this.gyro_updateTrackedPosition(way, x, z, "azimuth");
-
-                    // Log. (**DEBUG**)
-                    if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) break;
-                    GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Calculated and added Azimuth waypoint. (packet: {}, way: {}, id: {}, curData: {}, lastData: {}, curInvTan: {}, lastInvTan: {}, curCross: {}, lastCross: {}, x: {}, z: {}, diffX: {}, diffZ: {}, distSqr: {}, listener: {})", packet, way, id, curData, lastData, curInvTan, lastInvTan, curCross, lastCross, x, z, diffX, diffZ, distSqr, this);
-                }
+                case TrackedWaypoint.AzimuthWaypoint azimuth -> this.gyro_handleAzimuthWaypoint(azimuth);
 
                 // This is the other type of waypoint, we should remove everything.
-                default -> {
-                    // Log. (**TRACE**)
-                    if (GYRO_LOGGER.isTraceEnabled(Gyro.GYRO_MARKER)) {
-                        GYRO_LOGGER.trace(Gyro.GYRO_MARKER, "gyro: Unknown (empty?) waypoint received, removing... (packet: {}, way: {}, id: {}, listener: {})", packet, way, id, this);
-                    }
-
-                    // Remove.
-                    Gyro.ANGLES.remove(id);
-                    Gyro.RENDER_POSES.remove(id);
-
-                    // Log. (**DEBUG**)
-                    if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) break;
-                    GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Removed unknown waypoint. (packet: {}, way: {}, id: {}, listener: {})", packet, way, id, this);
-                }
+                default -> this.gyro_handleRemovedWaypoint(way);
             }
 
             // Pop the profiler.
             profiler.pop();
         });
+    }
+
+    /**
+     * Handles the vector waypoint.
+     *
+     * @param way Target waypoint
+     * @see #gyro_updateTrackedPosition(TrackedWaypoint, double, double, String)
+     * @see #gyro_handleChunkWaypoint(TrackedWaypoint.ChunkWaypoint)
+     * @see #gyro_handleAzimuthWaypoint(TrackedWaypoint.AzimuthWaypoint)
+     * @see #gyro_handleRemovedWaypoint(TrackedWaypoint)
+     */
+    @Unique
+    private void gyro_handleVectorWaypoint(TrackedWaypoint.Vec3iWaypoint way) {
+        // Validate.
+        assert way != null : "gyro: Parameter 'way' is null. (listener: " + this + ')';
+        assert this.minecraft.isSameThread() : "gyro: Handling vector waypoint NOT from the main thread. (thread: " + Thread.currentThread() + ", way: " + way + ", listener: " + this + ')';
+
+        // Log. (**TRACE**)
+        Either<UUID, String> id = way.id();
+        if (GYRO_LOGGER.isTraceEnabled(Gyro.GYRO_MARKER)) {
+            GYRO_LOGGER.trace(Gyro.GYRO_MARKER, "gyro: Vector waypoint received, adding... (way: {}, id: {}, listener: {})", way, id, this);
+        }
+
+        // Clear the angles data.
+        Gyro.ANGLES.remove(id);
+
+        // Send the status message.
+        Vec3i vector = ((Vec3iWaypointAccessor) way).gyro_vector();
+        int vx = vector.getX();
+        int vy = vector.getY();
+        int vz = vector.getZ();
+        Component info = this.gyro_waypointInfo(way);
+        Component player = this.gyro_waypointPlayerInfo(way);
+        Component entity = this.gyro_waypointEntityInfo(way);
+        Component x = Component.literal(Integer.toString(vx)).withStyle(ChatFormatting.GREEN);
+        Component y = Component.literal(Integer.toString(vy)).withStyle(ChatFormatting.GREEN);
+        Component z = Component.literal(Integer.toString(vz)).withStyle(ChatFormatting.GREEN);
+        this.minecraft.gui.getChat().addMessage(Component.translatableWithFallback("gyro.status.vector",
+                        "Received vector waypoint %s (player: %s, entity: %s) with position %s / %s / %s.", info, player, entity, x, y, z)
+                .withStyle(ChatFormatting.GRAY));
+
+        // Send the tracked message.
+        this.gyro_updateTrackedPosition(way, vx, vz, "vector");
+
+        // Log. (**DEBUG**)
+        if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) return;
+        GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Added Vector waypoint. (way: {}, id: {}, vector: {}, info: {}, player: {}, entity: {}, listener: {})", way, id, vector, info, player, entity, this);
+    }
+
+    /**
+     * Handles the chunk waypoint.
+     *
+     * @param way Target waypoint
+     * @see #gyro_updateTrackedPosition(TrackedWaypoint, double, double, String)
+     * @see #gyro_handleVectorWaypoint(TrackedWaypoint.Vec3iWaypoint)
+     * @see #gyro_handleAzimuthWaypoint(TrackedWaypoint.AzimuthWaypoint)
+     * @see #gyro_handleRemovedWaypoint(TrackedWaypoint)
+     */
+    @Unique
+    private void gyro_handleChunkWaypoint(TrackedWaypoint.ChunkWaypoint way) {
+        // Validate.
+        assert way != null : "gyro: Parameter 'way' is null. (listener: " + this + ')';
+        assert this.minecraft.isSameThread() : "gyro: Handling chunk waypoint NOT from the main thread. (thread: " + Thread.currentThread() + ", way: " + way + ", listener: " + this + ')';
+
+        // Log. (**TRACE**)
+        Either<UUID, String> id = way.id();
+        if (GYRO_LOGGER.isTraceEnabled(Gyro.GYRO_MARKER)) {
+            GYRO_LOGGER.trace(Gyro.GYRO_MARKER, "gyro: Chunk waypoint received, adding... (way: {}, id: {}, listener: {})", way, id, this);
+        }
+
+        // Clear the angles data.
+        Gyro.ANGLES.remove(id);
+
+        // Send the status message.
+        ChunkPos pos = ((ChunkWaypointAccessor) way).gyro_chunkPos();
+        int mx = pos.getMiddleBlockX();
+        int mz = pos.getMiddleBlockZ();
+        Component info = this.gyro_waypointInfo(way);
+        Component player = this.gyro_waypointPlayerInfo(way);
+        Component entity = this.gyro_waypointEntityInfo(way);
+        Component x = Component.literal(Integer.toString(mx)).withStyle(ChatFormatting.GREEN);
+        Component z = Component.literal(Integer.toString(mz)).withStyle(ChatFormatting.GREEN);
+        this.minecraft.gui.getChat().addMessage(Component.translatableWithFallback("gyro.status.chunk",
+                        "Received chunk waypoint %s (player: %s, entity: %s) with location %s / %s.", info, player, entity, x, z)
+                .withStyle(ChatFormatting.GRAY));
+
+        // Send the tracked message.
+        this.gyro_updateTrackedPosition(way, mx, mz, "chunk");
+
+        // Log. (**DEBUG**)
+        if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) return;
+        GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Added Chunk waypoint. (way: {}, id: {}, pos: {}, mx: {}, mz: {}, info: {}, player: {}, entity: {}, listener: {})", way, id, pos, mx, mz, info, player, entity, this);
+    }
+
+    /**
+     * Handles the azimuth waypoint.
+     *
+     * @param way Target waypoint
+     * @see #gyro_updateTrackedPosition(TrackedWaypoint, double, double, String)
+     * @see #gyro_handleVectorWaypoint(TrackedWaypoint.Vec3iWaypoint)
+     * @see #gyro_handleChunkWaypoint(TrackedWaypoint.ChunkWaypoint)
+     * @see #gyro_handleRemovedWaypoint(TrackedWaypoint)
+     */
+    @Unique
+    private void gyro_handleAzimuthWaypoint(TrackedWaypoint.AzimuthWaypoint way) {
+        // Validate.
+        assert way != null : "gyro: Parameter 'way' is null. (listener: " + this + ')';
+        assert this.minecraft.isSameThread() : "gyro: Handling azimuth waypoint NOT from the main thread. (thread: " + Thread.currentThread() + ", way: " + way + ", listener: " + this + ')';
+
+        // Log. (**TRACE**)
+        Either<UUID, String> id = way.id();
+        if (GYRO_LOGGER.isTraceEnabled(Gyro.GYRO_MARKER)) {
+            GYRO_LOGGER.trace(Gyro.GYRO_MARKER, "gyro: Azimuth waypoint received, calculating... (way: {}, id: {}, listener: {})", way, id, this);
+        }
+
+        // Send the status message.
+        float curYaw = ((AzimuthWaypointAccessor) way).gyro_angle();
+        Component info = this.gyro_waypointInfo(way);
+        Component player = this.gyro_waypointPlayerInfo(way);
+        Component entity = this.gyro_waypointEntityInfo(way);
+        Component angle = Component.literal("%.1f".formatted(Math.toDegrees(curYaw))).withStyle(ChatFormatting.GREEN);
+        this.minecraft.gui.getChat().addMessage(Component.translatableWithFallback("gyro.status.azimuth",
+                        "Received azimuth waypoint %s (player: %s, entity: %s) with angle %s.", info, player, entity, angle)
+                .withStyle(ChatFormatting.GRAY));
+
+        // Get the player.
+        Entity camera = this.minecraft.cameraEntity;
+        if (camera == null) {
+            // Log, stop. (**DEBUG**)
+            if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) return;
+            GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Skipping adding Azimuth waypoint, no camera found. (way: {}, id: {}, info: {}, player: {}, entity: {}, angle: {}, listener: {})", way, id, info, player, entity, angle, this);
+            return;
+        }
+
+        // Capture the current state.
+        double curX = camera.getX();
+        double curZ = camera.getZ();
+        GyroData curData = new GyroData(curYaw, curX, curZ);
+
+        // Get the last data, skip if no last data or equal to current data.
+        GyroData lastData = Gyro.ANGLES.put(id, curData);
+        if ((lastData == null) || lastData.equals(curData)) {
+            // Log, stop. (**DEBUG**)
+            if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) return;
+            GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Skipping adding Azimuth waypoint, last data is the same or missing. (way: {}, id: {}, info: {}, player: {}, entity: {}, angle: {}, curData: {}, lastData: {}, listener: {})", way, id, info, player, entity, angle, curData, lastData, this);
+            return;
+        }
+        double lastYaw = lastData.angle();
+        double lastX = lastData.x();
+        double lastZ = lastData.z();
+
+        // Calculate the tangents to the player.
+        double curInvTan = (-1.0D / Math.tan(curYaw));
+        double lastInvTan = (-1.0D / Math.tan(lastYaw));
+        double curCross = (curZ - (curX * curInvTan));
+        double lastCross = (lastZ - (lastX * lastInvTan));
+
+        // Calculate the position based on tangents cross-point.
+        double x = ((lastCross - curCross) / (curInvTan - lastInvTan));
+        double z = ((x * curInvTan) + curCross);
+
+        // If the position is unrealistic, the other player is probably moving.
+        if ((x <= -Level.MAX_LEVEL_SIZE) || (z <= -Level.MAX_LEVEL_SIZE) ||
+                (x >= Level.MAX_LEVEL_SIZE) || (z >= Level.MAX_LEVEL_SIZE)) {
+            // Log, stop. (**DEBUG**)
+            if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) return;
+            GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Skipping adding Azimuth waypoint, the calculated position is unrealistic. (way: {}, id: {}, info: {}, player: {}, entity: {}, angle: {}, curData: {}, lastData: {}, curInvTan: {}, lastInvTan: {}, curCross: {}, lastCross: {}, x: {}, z: {}, listener: {})", way, id, info, player, entity, angle, curData, lastData, curInvTan, lastInvTan, curCross, lastCross, x, z, this);
+            return;
+        }
+
+        // Calculate the Euclidean distance and ignore if it's too close.
+        // This is a hack for moving player that forces THEM to recalculate OUR position.
+        double diffX = (curX - x);
+        double diffZ = (curZ - z);
+        double distSqr = ((diffX * diffX) + (diffZ * diffZ));
+        if (distSqr <= (8 * 8)) {
+            // Log, stop. (**DEBUG**)
+            if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) return;
+            GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Skipping adding Azimuth waypoint, the calculated position is too close. (way: {}, id: {}, info: {}, player: {}, entity: {}, angle: {}, curData: {}, lastData: {}, curInvTan: {}, lastInvTan: {}, curCross: {}, lastCross: {}, x: {}, z: {}, diffX: {}, diffZ: {}, distSqr: {}, listener: {})", way, id, info, player, entity, angle, curData, lastData, curInvTan, lastInvTan, curCross, lastCross, x, z, diffX, diffZ, distSqr, this);
+            return;
+        }
+
+        // Send the tracked message.
+        this.gyro_updateTrackedPosition(way, x, z, "azimuth");
+
+        // Log. (**DEBUG**)
+        if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) return;
+        GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Calculated and added Azimuth waypoint. (way: {}, id: {}, info: {}, player: {}, entity: {}, angle: {}, curData: {}, lastData: {}, curInvTan: {}, lastInvTan: {}, curCross: {}, lastCross: {}, x: {}, z: {}, diffX: {}, diffZ: {}, distSqr: {}, listener: {})", way, id, info, player, entity, angle, curData, lastData, curInvTan, lastInvTan, curCross, lastCross, x, z, diffX, diffZ, distSqr, this);
+    }
+
+    /**
+     * Handles the removed waypoint.
+     *
+     * @param way Target waypoint
+     * @see #gyro_updateTrackedPosition(TrackedWaypoint, double, double, String)
+     * @see #gyro_handleVectorWaypoint(TrackedWaypoint.Vec3iWaypoint)
+     * @see #gyro_handleChunkWaypoint(TrackedWaypoint.ChunkWaypoint)
+     * @see #gyro_handleAzimuthWaypoint(TrackedWaypoint.AzimuthWaypoint)
+     */
+    @Unique
+    private void gyro_handleRemovedWaypoint(TrackedWaypoint way) {
+        // Validate.
+        assert way != null : "gyro: Parameter 'way' is null. (listener: " + this + ')';
+        assert this.minecraft.isSameThread() : "gyro: Handling removed waypoint NOT from the main thread. (thread: " + Thread.currentThread() + ", way: " + way + ", listener: " + this + ')';
+
+        // Log. (**TRACE**)
+        Either<UUID, String> id = way.id();
+        if (GYRO_LOGGER.isTraceEnabled(Gyro.GYRO_MARKER)) {
+            GYRO_LOGGER.trace(Gyro.GYRO_MARKER, "gyro: Unknown (empty?) waypoint received, removing... (way: {}, id: {}, listener: {})", way, id, this);
+        }
+
+        // Remove.
+        Gyro.ANGLES.remove(id);
+        Gyro.RENDER_POSES.remove(id);
+
+        // Send the status message.
+        Component info = this.gyro_waypointInfo(way);
+        Component player = this.gyro_waypointPlayerInfo(way);
+        Component entity = this.gyro_waypointEntityInfo(way);
+        this.minecraft.gui.getChat().addMessage(Component.translatableWithFallback("gyro.status.null",
+                        "Deleted waypoint %s (player: %s, entity: %s).", info, player, entity)
+                .withStyle(ChatFormatting.GRAY));
+
+        // Log. (**DEBUG**)
+        if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) return;
+        GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Removed unknown waypoint. (way: {}, id: {}, info: {}, player: {}, entity: {}, listener: {})", way, id, info, player, entity, this);
     }
 
     /**
@@ -282,6 +407,9 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
      * @param x    Alleged waypoint X position
      * @param z    Alleged waypoint Z position
      * @param type Waypoint update type to show to player
+     * @see #gyro_waypointInfo(TrackedWaypoint)
+     * @see #gyro_waypointPlayerInfo(TrackedWaypoint)
+     * @see #gyro_waypointEntityInfo(TrackedWaypoint)
      */
     @Unique
     private void gyro_updateTrackedPosition(TrackedWaypoint way, double x, double z, String type) {
@@ -307,28 +435,86 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
         Gyro.RENDER_POSES.put(id, new GyroRender(x, z, color));
 
         // Send the message.
-        ClientLevel level = this.level;
-        String either = id.right().orElseGet(() -> id.orThrow().toString());
-        Component player = id.left()
-                .map(this.playerInfoMap::get)
-                .map(info -> Component.literal(info.getProfile().getName()).withStyle(ChatFormatting.GREEN))
-                .orElseGet(() -> Component.translatableWithFallback("gyro.null.player", "<not found>").withStyle(ChatFormatting.YELLOW));
-        Component entity = id.left()
-                .map(uuid -> (level != null) ? level.getEntity(uuid) : null)
-                .map(Entity::getDisplayName)
-                .map(name -> name.copy().withStyle(ChatFormatting.GREEN))
-                .orElseGet(() -> Component.translatableWithFallback("gyro.null.entity", "<not found>").withStyle(ChatFormatting.YELLOW));
+        Component info = this.gyro_waypointInfo(way);
+        Component player = this.gyro_waypointPlayerInfo(way);
+        Component entity = this.gyro_waypointEntityInfo(way);
         this.minecraft.gui.getChat().addMessage(Component.translatableWithFallback("gyro.found",
                 "Waypoint %s (player: %s, entity: %s) found at %s / %s via %s.",
-                Component.literal(either).withStyle(ChatFormatting.GREEN),
-                player,
-                entity,
+                info, player, entity,
                 Component.literal("%.1f".formatted(x)).withStyle(ChatFormatting.GREEN),
                 Component.literal("%.1f".formatted(z)).withStyle(ChatFormatting.GREEN),
                 Component.translatableWithFallback("gyro.found." + type, type).withStyle(ChatFormatting.GREEN)));
 
         // Log. (**DEBUG**)
         if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) return;
-        GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Updated tracker position. (way: {}, x: {}, z: {}, type: {}, id: {}, color: {}, either: {}, player: {}, entity: {}, listener: {})", way, x, z, type, id, color, either, player, entity, this);
+        GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Updated tracker position. (way: {}, x: {}, z: {}, type: {}, id: {}, color: {}, info: {}, player: {}, entity: {}, listener: {})", way, x, z, type, id, color, info, player, entity, this);
+    }
+
+    /**
+     * Create the component from the waypoint info.
+     *
+     * @param way Target waypoint
+     * @return A new waypoint component
+     * @see #gyro_waypointPlayerInfo(TrackedWaypoint)
+     * @see #gyro_waypointEntityInfo(TrackedWaypoint)
+     */
+    @Contract(pure = true)
+    @Unique
+    private Component gyro_waypointInfo(TrackedWaypoint way) {
+        // Validate.
+        assert way != null : "gyro: Parameter 'way' is null. (listener: " + this + ')';
+        assert this.minecraft.isSameThread() : "gyro: Getting waypoint info NOT from the main thread. (thread: " + Thread.currentThread() + ", way: " + way + ", listener: " + this + ')';
+
+        // Return.
+        Either<UUID, String> id = way.id();
+        return Component.literal(id.right().orElseGet(() -> id.orThrow().toString())).withStyle(ChatFormatting.GREEN);
+    }
+
+    /**
+     * Gets the player info by waypoint, if available.
+     *
+     * @param way Target waypoint
+     * @return Player username component or a "not found" component
+     * @see #gyro_waypointInfo(TrackedWaypoint)
+     * @see #gyro_waypointEntityInfo(TrackedWaypoint)
+     * @see #GYRO_NULL_PLAYER
+     */
+    @Contract(pure = true)
+    @Unique
+    private Component gyro_waypointPlayerInfo(TrackedWaypoint way) {
+        // Validate.
+        assert way != null : "gyro: Parameter 'way' is null. (listener: " + this + ')';
+        assert this.minecraft.isSameThread() : "gyro: Getting waypoint player info NOT from the main thread. (thread: " + Thread.currentThread() + ", way: " + way + ", listener: " + this + ')';
+
+        // Return.
+        return way.id().left()
+                .map(this.playerInfoMap::get)
+                .map(info -> (Component) Component.literal(info.getProfile().getName()).withStyle(ChatFormatting.GREEN))
+                .orElse(GYRO_NULL_PLAYER);
+    }
+
+    /**
+     * Gets the entity info by waypoint, if available.
+     *
+     * @param way Target waypoint
+     * @return Entity display name component or a "not found" component
+     * @see #gyro_waypointInfo(TrackedWaypoint)
+     * @see #gyro_waypointPlayerInfo(TrackedWaypoint)
+     * @see #GYRO_NULL_ENTITY
+     */
+    @Contract(pure = true)
+    @Unique
+    private Component gyro_waypointEntityInfo(TrackedWaypoint way) {
+        // Validate.
+        assert way != null : "gyro: Parameter 'way' is null. (listener: " + this + ')';
+        assert this.minecraft.isSameThread() : "gyro: Getting waypoint entity info NOT from the main thread. (thread: " + Thread.currentThread() + ", way: " + way + ", listener: " + this + ')';
+
+        // Return.
+        ClientLevel level = this.level;
+        return way.id().left()
+                .map(uuid -> (level != null) ? level.getEntity(uuid) : null)
+                .map(Entity::getDisplayName)
+                .map(name -> (Component) name.copy().withStyle(ChatFormatting.GREEN))
+                .orElse(GYRO_NULL_ENTITY);
     }
 }
