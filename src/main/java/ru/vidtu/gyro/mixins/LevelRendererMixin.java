@@ -60,6 +60,8 @@ import java.util.Collection;
  *
  * @author VidTu
  * @apiNote Internal use only
+ * @see Gyro
+ * @see GyroRender
  */
 // @ApiStatus.Internal // Can't annotate this without logging in the console.
 @Mixin(LevelRenderer.class)

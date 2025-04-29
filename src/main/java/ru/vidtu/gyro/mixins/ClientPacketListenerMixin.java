@@ -67,6 +67,8 @@ import java.util.UUID;
  *
  * @author VidTu
  * @apiNote Internal use only
+ * @see Gyro
+ * @see GyroData
  */
 // @ApiStatus.Internal // Can't annotate this without logging in the console.
 @Mixin(ClientPacketListener.class)
@@ -104,6 +106,8 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
      *
      * @param packet Packet to extract the data from
      * @param ci     Callback data, ignored
+     * @see GyroData
+     * @see #gyro_updateTrackedPosition(TrackedWaypoint, double, double, String)
      */
     @Inject(method = "handleWaypoint", at = @At("RETURN"))
     private void gyro_handleWaypoint_return(ClientboundTrackedWaypointPacket packet, CallbackInfo ci) {
@@ -224,7 +228,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
                     double diffX = (curX - x);
                     double diffZ = (curZ - z);
                     double distSqr = ((diffX * diffX) + (diffZ * diffZ));
-                    if (distSqr <= 64) {
+                    if (distSqr <= (8 * 8)) {
                         // Log, stop. (**DEBUG**)
                         if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) break;
                         GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Skipping adding Azimuth waypoint, the calculated position is too close. (packet: {}, way: {}, id: {}, curData: {}, lastData: {}, curInvTan: {}, lastInvTan: {}, curCross: {}, lastCross: {}, x: {}, z: {}, diffX: {}, diffZ: {}, distSqr: {}, listener: {})", packet, way, id, curData, lastData, curInvTan, lastInvTan, curCross, lastCross, x, z, diffX, diffZ, distSqr, this);

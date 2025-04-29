@@ -48,6 +48,7 @@ import ru.vidtu.gyro.Gyro;
  *
  * @author VidTu
  * @apiNote Internal use only
+ * @see Gyro
  */
 // @ApiStatus.Internal // Can't annotate this without logging in the console.
 @Mixin(Minecraft.class)
@@ -77,6 +78,8 @@ public abstract class MinecraftMixin extends ReentrantBlockableEventLoop<Runnabl
      *
      * @param level New level, {@code null} if was unloaded, ignored
      * @param ci    Callback data, ignored
+     * @see Gyro#RENDER_POSES
+     * @see Gyro#ANGLES
      */
     @Inject(method = "updateLevelInEngines", at = @At("RETURN"))
     private void gyro_updateLevelInEngines_return(@Nullable ClientLevel level, CallbackInfo ci) {

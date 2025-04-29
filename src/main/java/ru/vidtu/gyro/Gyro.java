@@ -84,12 +84,13 @@ public final class Gyro implements ClientModInitializer {
      */
     @Override
     public void onInitializeClient() {
+        // Log.
         LOGGER.info(GYRO_MARKER, "gyro: Hi!");
     }
 
     @Contract(pure = true)
     @Override
     public String toString() {
-        return "gyro{}";
+        return "gyro/Gyro{}";
     }
 }
