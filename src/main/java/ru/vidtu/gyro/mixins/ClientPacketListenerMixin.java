@@ -83,20 +83,36 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
     private static final Logger GYRO_LOGGER = LoggerFactory.getLogger("gyro/ClientPacketListenerMixin");
 
     /**
-     * A "not found" component for {@link #gyro_waypointPlayerInfo(TrackedWaypoint)}.
+     * A "not found" component for {@link #gyro_waypointPlayerInfo(TrackedWaypoint, boolean)} without dimming.
      *
-     * @see #gyro_waypointPlayerInfo(TrackedWaypoint)
+     * @see #gyro_waypointPlayerInfo(TrackedWaypoint, boolean)
      */
     @Unique
     private static final Component GYRO_NULL_PLAYER = Component.translatableWithFallback("gyro.null.player", "<not found>").withStyle(ChatFormatting.YELLOW);
 
     /**
-     * A "not found" component for {@link #gyro_waypointEntityInfo(TrackedWaypoint)}.
+     * A "not found" component for {@link #gyro_waypointPlayerInfo(TrackedWaypoint, boolean)} with dimming.
      *
-     * @see #gyro_waypointEntityInfo(TrackedWaypoint)
+     * @see #gyro_waypointPlayerInfo(TrackedWaypoint, boolean)
+     */
+    @Unique
+    private static final Component GYRO_NULL_PLAYER_DIM = Component.translatableWithFallback("gyro.null.player", "<not found>").withStyle(ChatFormatting.DARK_GRAY);
+
+    /**
+     * A "not found" component for {@link #gyro_waypointEntityInfo(TrackedWaypoint, boolean)} without dimming.
+     *
+     * @see #gyro_waypointEntityInfo(TrackedWaypoint, boolean)
      */
     @Unique
     private static final Component GYRO_NULL_ENTITY = Component.translatableWithFallback("gyro.null.entity", "<not found>").withStyle(ChatFormatting.YELLOW);
+
+    /**
+     * A "not found" component for {@link #gyro_waypointEntityInfo(TrackedWaypoint, boolean)} with dimming.
+     *
+     * @see #gyro_waypointEntityInfo(TrackedWaypoint, boolean)
+     */
+    @Unique
+    private static final Component GYRO_NULL_ENTITY_DIM = Component.translatableWithFallback("gyro.null.entity", "<not found>").withStyle(ChatFormatting.DARK_GRAY);
 
     /**
      * Player lookup map used in {@link #gyro_updateTrackedPosition(TrackedWaypoint, double, double, String)}.
@@ -203,12 +219,12 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
         int vx = vector.getX();
         int vy = vector.getY();
         int vz = vector.getZ();
-        Component info = this.gyro_waypointInfo(way);
-        Component player = this.gyro_waypointPlayerInfo(way);
-        Component entity = this.gyro_waypointEntityInfo(way);
-        Component x = Component.literal(Integer.toString(vx)).withStyle(ChatFormatting.GREEN);
-        Component y = Component.literal(Integer.toString(vy)).withStyle(ChatFormatting.GREEN);
-        Component z = Component.literal(Integer.toString(vz)).withStyle(ChatFormatting.GREEN);
+        Component info = this.gyro_waypointInfo(way, /*dim=*/true);
+        Component player = this.gyro_waypointPlayerInfo(way, /*dim=*/true);
+        Component entity = this.gyro_waypointEntityInfo(way, /*dim=*/true);
+        Component x = Component.literal(Integer.toString(vx)).withStyle(ChatFormatting.ITALIC);
+        Component y = Component.literal(Integer.toString(vy)).withStyle(ChatFormatting.ITALIC);
+        Component z = Component.literal(Integer.toString(vz)).withStyle(ChatFormatting.ITALIC);
         this.minecraft.gui.getChat().addMessage(Component.translatableWithFallback("gyro.status.vector",
                         "Received vector waypoint %s (player: %s, entity: %s) with position %s / %s / %s.", info, player, entity, x, y, z)
                 .withStyle(ChatFormatting.GRAY));
@@ -249,11 +265,11 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
         ChunkPos pos = ((ChunkWaypointAccessor) way).gyro_chunkPos();
         int mx = pos.getMiddleBlockX();
         int mz = pos.getMiddleBlockZ();
-        Component info = this.gyro_waypointInfo(way);
-        Component player = this.gyro_waypointPlayerInfo(way);
-        Component entity = this.gyro_waypointEntityInfo(way);
-        Component x = Component.literal(Integer.toString(mx)).withStyle(ChatFormatting.GREEN);
-        Component z = Component.literal(Integer.toString(mz)).withStyle(ChatFormatting.GREEN);
+        Component info = this.gyro_waypointInfo(way, /*dim=*/true);
+        Component player = this.gyro_waypointPlayerInfo(way, /*dim=*/true);
+        Component entity = this.gyro_waypointEntityInfo(way, /*dim=*/true);
+        Component x = Component.literal(Integer.toString(mx)).withStyle(ChatFormatting.ITALIC);
+        Component z = Component.literal(Integer.toString(mz)).withStyle(ChatFormatting.ITALIC);
         this.minecraft.gui.getChat().addMessage(Component.translatableWithFallback("gyro.status.chunk",
                         "Received chunk waypoint %s (player: %s, entity: %s) with location %s / %s.", info, player, entity, x, z)
                 .withStyle(ChatFormatting.GRAY));
@@ -289,10 +305,10 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 
         // Send the status message.
         float curYaw = ((AzimuthWaypointAccessor) way).gyro_angle();
-        Component info = this.gyro_waypointInfo(way);
-        Component player = this.gyro_waypointPlayerInfo(way);
-        Component entity = this.gyro_waypointEntityInfo(way);
-        Component angle = Component.literal("%.1f".formatted(Math.toDegrees(curYaw))).withStyle(ChatFormatting.GREEN);
+        Component info = this.gyro_waypointInfo(way, /*dim=*/true);
+        Component player = this.gyro_waypointPlayerInfo(way, /*dim=*/true);
+        Component entity = this.gyro_waypointEntityInfo(way, /*dim=*/true);
+        Component angle = Component.literal("%.1f".formatted(Math.toDegrees(curYaw))).withStyle(ChatFormatting.ITALIC);
         this.minecraft.gui.getChat().addMessage(Component.translatableWithFallback("gyro.status.azimuth",
                         "Received azimuth waypoint %s (player: %s, entity: %s) with angle %s.", info, player, entity, angle)
                 .withStyle(ChatFormatting.GRAY));
@@ -388,9 +404,9 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
         Gyro.RENDER_POSES.remove(id);
 
         // Send the status message.
-        Component info = this.gyro_waypointInfo(way);
-        Component player = this.gyro_waypointPlayerInfo(way);
-        Component entity = this.gyro_waypointEntityInfo(way);
+        Component info = this.gyro_waypointInfo(way, /*dim=*/true);
+        Component player = this.gyro_waypointPlayerInfo(way, /*dim=*/true);
+        Component entity = this.gyro_waypointEntityInfo(way, /*dim=*/true);
         this.minecraft.gui.getChat().addMessage(Component.translatableWithFallback("gyro.status.null",
                         "Deleted waypoint %s (player: %s, entity: %s).", info, player, entity)
                 .withStyle(ChatFormatting.GRAY));
@@ -407,9 +423,9 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
      * @param x    Alleged waypoint X position
      * @param z    Alleged waypoint Z position
      * @param type Waypoint update type to show to player
-     * @see #gyro_waypointInfo(TrackedWaypoint)
-     * @see #gyro_waypointPlayerInfo(TrackedWaypoint)
-     * @see #gyro_waypointEntityInfo(TrackedWaypoint)
+     * @see #gyro_waypointInfo(TrackedWaypoint, boolean)
+     * @see #gyro_waypointPlayerInfo(TrackedWaypoint, boolean)
+     * @see #gyro_waypointEntityInfo(TrackedWaypoint, boolean)
      */
     @Unique
     private void gyro_updateTrackedPosition(TrackedWaypoint way, double x, double z, String type) {
@@ -435,9 +451,9 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
         Gyro.RENDER_POSES.put(id, new GyroRender(x, z, color));
 
         // Send the message.
-        Component info = this.gyro_waypointInfo(way);
-        Component player = this.gyro_waypointPlayerInfo(way);
-        Component entity = this.gyro_waypointEntityInfo(way);
+        Component info = this.gyro_waypointInfo(way, /*dim=*/false);
+        Component player = this.gyro_waypointPlayerInfo(way, /*dim=*/false);
+        Component entity = this.gyro_waypointEntityInfo(way, /*dim=*/false);
         this.minecraft.gui.getChat().addMessage(Component.translatableWithFallback("gyro.found",
                 "Waypoint %s (player: %s, entity: %s) found at %s / %s via %s.",
                 info, player, entity,
@@ -454,67 +470,72 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
      * Create the component from the waypoint info.
      *
      * @param way Target waypoint
+     * @param dim Whether the styling should be dim
      * @return A new waypoint component
-     * @see #gyro_waypointPlayerInfo(TrackedWaypoint)
-     * @see #gyro_waypointEntityInfo(TrackedWaypoint)
+     * @see #gyro_waypointPlayerInfo(TrackedWaypoint, boolean)
+     * @see #gyro_waypointEntityInfo(TrackedWaypoint, boolean)
      */
     @Contract(pure = true)
     @Unique
-    private Component gyro_waypointInfo(TrackedWaypoint way) {
+    private Component gyro_waypointInfo(TrackedWaypoint way, boolean dim) {
         // Validate.
-        assert way != null : "gyro: Parameter 'way' is null. (listener: " + this + ')';
-        assert this.minecraft.isSameThread() : "gyro: Getting waypoint info NOT from the main thread. (thread: " + Thread.currentThread() + ", way: " + way + ", listener: " + this + ')';
+        assert way != null : "gyro: Parameter 'way' is null. (dim: " + dim + ", listener: " + this + ')';
+        assert this.minecraft.isSameThread() : "gyro: Getting waypoint info NOT from the main thread. (thread: " + Thread.currentThread() + ", way: " + way + ", dim: " + dim + ", listener: " + this + ')';
 
         // Return.
         Either<UUID, String> id = way.id();
-        return Component.literal(id.right().orElseGet(() -> id.orThrow().toString())).withStyle(ChatFormatting.GREEN);
+        return Component.literal(id.right().orElseGet(() -> id.orThrow().toString())).withStyle(dim ? ChatFormatting.ITALIC : ChatFormatting.GREEN);
     }
 
     /**
      * Gets the player info by waypoint, if available.
      *
      * @param way Target waypoint
+     * @param dim Whether the styling should be dim
      * @return Player username component or a "not found" component
-     * @see #gyro_waypointInfo(TrackedWaypoint)
-     * @see #gyro_waypointEntityInfo(TrackedWaypoint)
+     * @see #gyro_waypointInfo(TrackedWaypoint, boolean)
+     * @see #gyro_waypointEntityInfo(TrackedWaypoint, boolean)
      * @see #GYRO_NULL_PLAYER
+     * @see #GYRO_NULL_PLAYER_DIM
      */
     @Contract(pure = true)
     @Unique
-    private Component gyro_waypointPlayerInfo(TrackedWaypoint way) {
+    private Component gyro_waypointPlayerInfo(TrackedWaypoint way, boolean dim) {
         // Validate.
-        assert way != null : "gyro: Parameter 'way' is null. (listener: " + this + ')';
-        assert this.minecraft.isSameThread() : "gyro: Getting waypoint player info NOT from the main thread. (thread: " + Thread.currentThread() + ", way: " + way + ", listener: " + this + ')';
+        assert way != null : "gyro: Parameter 'way' is null. (dim: " + dim + ", listener: " + this + ')';
+        assert this.minecraft.isSameThread() : "gyro: Getting waypoint player info NOT from the main thread. (thread: " + Thread.currentThread() + ", way: " + way + ", dim: " + dim + ", listener: " + this + ')';
 
         // Return.
         return way.id().left()
                 .map(this.playerInfoMap::get)
-                .map(info -> (Component) Component.literal(info.getProfile().getName()).withStyle(ChatFormatting.GREEN))
-                .orElse(GYRO_NULL_PLAYER);
+                .map(info -> (Component) Component.literal(info.getProfile().getName()).withStyle(dim ? ChatFormatting.ITALIC : ChatFormatting.GREEN))
+                .orElse(dim ? GYRO_NULL_PLAYER_DIM : GYRO_NULL_PLAYER);
     }
 
     /**
      * Gets the entity info by waypoint, if available.
      *
      * @param way Target waypoint
+     * @param dim Whether the styling should be dim
      * @return Entity display name component or a "not found" component
-     * @see #gyro_waypointInfo(TrackedWaypoint)
-     * @see #gyro_waypointPlayerInfo(TrackedWaypoint)
+     * @see #gyro_waypointInfo(TrackedWaypoint, boolean)
+     * @see #gyro_waypointPlayerInfo(TrackedWaypoint, boolean)
      * @see #GYRO_NULL_ENTITY
+     * @see #GYRO_NULL_ENTITY_DIM
      */
     @Contract(pure = true)
     @Unique
-    private Component gyro_waypointEntityInfo(TrackedWaypoint way) {
+    private Component gyro_waypointEntityInfo(TrackedWaypoint way, boolean dim) {
         // Validate.
-        assert way != null : "gyro: Parameter 'way' is null. (listener: " + this + ')';
-        assert this.minecraft.isSameThread() : "gyro: Getting waypoint entity info NOT from the main thread. (thread: " + Thread.currentThread() + ", way: " + way + ", listener: " + this + ')';
+        assert way != null : "gyro: Parameter 'way' is null. (dim: " + dim + ", listener: " + this + ')';
+        assert this.minecraft.isSameThread() : "gyro: Getting waypoint entity info NOT from the main thread. (thread: " + Thread.currentThread() + ", way: " + way + ", dim: " + dim + ", listener: " + this + ')';
 
         // Return.
         ClientLevel level = this.level;
         return way.id().left()
                 .map(uuid -> (level != null) ? level.getEntity(uuid) : null)
                 .map(Entity::getDisplayName)
-                .map(name -> (Component) name.copy().withStyle(ChatFormatting.GREEN))
-                .orElse(GYRO_NULL_ENTITY);
+                .map(name -> (Component) name.copy().withStyle(dim ? ChatFormatting.ITALIC : ChatFormatting.GREEN))
+                .orElse(dim ? GYRO_NULL_ENTITY_DIM : GYRO_NULL_ENTITY);
     }
 }
