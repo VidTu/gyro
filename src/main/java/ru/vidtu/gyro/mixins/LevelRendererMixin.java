@@ -114,7 +114,7 @@ public class LevelRendererMixin {
      * @param source               Buffer rendering source
      * @param blockBreakAnimSource Buffer rendering source for rendering the block breaking overlay, ignored
      * @param camera               Current camera data
-     * @param partialTick          Current partial tick
+     * @param partialTick          Current partial tick (not to be confused with the tick delta)
      * @param ci                   Callback data, ignored
      * @see BeaconRenderer#BEAM_LOCATION
      * @see BeaconRenderer#renderBeaconBeam(PoseStack, MultiBufferSource, ResourceLocation, float, float, long, int, int, int, float, float)
