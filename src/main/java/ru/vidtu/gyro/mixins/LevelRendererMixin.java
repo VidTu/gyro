@@ -114,7 +114,7 @@ public class LevelRendererMixin {
      * @param source               Buffer rendering source
      * @param blockBreakAnimSource Buffer rendering source for rendering the block breaking overlay, ignored
      * @param camera               Current camera data
-     * @param tickDelta            Current tick data
+     * @param partialTick          Current partial tick
      * @param ci                   Callback data, ignored
      * @see BeaconRenderer#BEAM_LOCATION
      * @see BeaconRenderer#renderBeaconBeam(PoseStack, MultiBufferSource, ResourceLocation, float, float, long, int, int, int, float, float)
@@ -123,14 +123,14 @@ public class LevelRendererMixin {
     @Inject(method = "renderBlockEntities", at = @At("RETURN"))
     private void gyro_renderBlockEntities_return(PoseStack pose, MultiBufferSource.BufferSource source,
                                                  MultiBufferSource.BufferSource blockBreakAnimSource,
-                                                 Camera camera, float tickDelta, CallbackInfo ci) {
+                                                 Camera camera, float partialTick, CallbackInfo ci) {
         // Validate.
-        assert pose != null : "gyro: Parameter 'pose' is null. (source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", tickDelta: " + tickDelta + ", renderer: " + this + ')';
-        assert source != null : "gyro: Parameter 'source' is null. (pose: " + pose + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", tickDelta: " + tickDelta + ", renderer: " + this + ')';
-        assert blockBreakAnimSource != null : "gyro: Parameter 'blockBreakAnimSource' is null. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", tickDelta: " + tickDelta + ", renderer: " + this + ')';
-        assert camera != null : "gyro: Parameter 'camera' is null. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", tickDelta: " + tickDelta + ", renderer: " + this + ')';
-        assert (tickDelta >= 0.0F) && (tickDelta <= 1.0F) : "gyro: Parameter 'tickDelta' is not in the [0..1] range. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", tickDelta: " + tickDelta + ", renderer: " + this + ')';
-        assert this.minecraft.isSameThread() : "gyro: Rendering block entities NOT from the main thread. (thread: " + Thread.currentThread() + ", pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", tickDelta: " + tickDelta + ", renderer: " + this + ')';
+        assert pose != null : "gyro: Parameter 'pose' is null. (source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", partialTick: " + partialTick + ", renderer: " + this + ')';
+        assert source != null : "gyro: Parameter 'source' is null. (pose: " + pose + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", partialTick: " + partialTick + ", renderer: " + this + ')';
+        assert blockBreakAnimSource != null : "gyro: Parameter 'blockBreakAnimSource' is null. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", partialTick: " + partialTick + ", renderer: " + this + ')';
+        assert camera != null : "gyro: Parameter 'camera' is null. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", partialTick: " + partialTick + ", renderer: " + this + ')';
+        assert (partialTick >= 0.0F) && (partialTick <= 1.0F) : "gyro: Parameter 'partialTick' is not in the [0..1] range. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", partialTick: " + partialTick + ", renderer: " + this + ')';
+        assert this.minecraft.isSameThread() : "gyro: Rendering block entities NOT from the main thread. (thread: " + Thread.currentThread() + ", pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", partialTick: " + partialTick + ", renderer: " + this + ')';
 
         // Get and push the profiler.
         ProfilerFiller profiler = Profiler.get();
@@ -155,7 +155,7 @@ public class LevelRendererMixin {
 
         // Extract the level.
         ClientLevel level = this.level;
-        assert level != null : "gyro: Rendering block entities without a client level. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", tickDelta: " + tickDelta + ", renderer: " + this + ')';
+        assert level != null : "gyro: Rendering block entities without a client level. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", partialTick: " + partialTick + ", renderer: " + this + ')';
 
         // Render each pos as a beam.
         for (GyroRender pos : poses) {
@@ -167,7 +167,7 @@ public class LevelRendererMixin {
 
             // Scale and render.
             float scale = Math.max(1.0F, (float) (Math.sqrt((x * x) + (z * z)) / 48.0D));
-            BeaconRenderer.renderBeaconBeam(pose, source, BeaconRenderer.BEAM_LOCATION, tickDelta, /*textureDensity=*/1.0F, level.getGameTime(), -(BeaconRenderer.MAX_RENDER_Y / 2), BeaconRenderer.MAX_RENDER_Y, pos.color(), BeaconRenderer.SOLID_BEAM_RADIUS * scale, BeaconRenderer.BEAM_GLOW_RADIUS * scale); // Implicit NPE for 'source', 'level'
+            BeaconRenderer.renderBeaconBeam(pose, source, BeaconRenderer.BEAM_LOCATION, partialTick, /*textureDensity=*/1.0F, level.getGameTime(), -(BeaconRenderer.MAX_RENDER_Y / 2), BeaconRenderer.MAX_RENDER_Y, pos.color(), BeaconRenderer.SOLID_BEAM_RADIUS * scale, BeaconRenderer.BEAM_GLOW_RADIUS * scale); // Implicit NPE for 'source', 'level'
 
             // Pop.
             pose.popPose();
