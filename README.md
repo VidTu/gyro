@@ -12,7 +12,7 @@ This mod has _no required dependencies_, besides the loader and the game.
 You'll need:
 
 - Fabric Loader (>=0.16.13)
-- Minecraft (25w18a)
+- Minecraft (25w19a)
 - Optional: Fabric API ("Fabric Resource Loader" module)
 
 Fabric API is **NOT** required, but you can install it for localization support.
@@ -56,7 +56,7 @@ You'll need a GitHub account to download these.
 **A**: Fabric is supported. Quilt should work too.
 
 **Q**: Which Minecraft versions are supported?  
-**A**: Minecraft 25w18a. (a snapshot for 1.21.6[^1])
+**A**: Minecraft 25w19a. (a snapshot for 1.21.6[^1])
 
 **Q**: Do I need to install Fabric API or Quilt Standard Libraries?  
 **A**: No, but you can install these for other mods and/or localization support.
