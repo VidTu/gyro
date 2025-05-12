@@ -42,55 +42,22 @@ group = "ru.vidtu.gyro"
 base.archivesName = "gyro"
 description = "Abuses the newly introduced (1.21.6) Minecraft waypoint system to get player positions."
 
+repositories {
+    mavenCentral()
+    maven("https://maven.fabricmc.net/") // Fabric.
+}
+
 loom {
     accessWidenerPath = file("src/main/resources/gyro.accesswidener")
-    log4jConfigs.setFrom("log4j2.xml")
+    log4jConfigs.setFrom("dev/log4j2.xml")
     silentMojangMappingsLicense()
     runs.named("client") {
-        vmArgs(
-            // Allow JVM without hotswap to work.
-            "-XX:+IgnoreUnrecognizedVMOptions",
-
-            // Set up RAM.
-            "-Xmx2G",
-
-            // Force UNIX newlines.
-            "-Dline.separator=\n",
-
-            // Force datafixers not to do our CPU.
-            "-Dmax.bg.threads=1",
-
-            // Debug arguments.
-            "-ea",
-            "-esa",
-            "-Dmixin.debug=true",
-            "-Dmixin.debug.strict.unique=true",
-            "-Dmixin.checks=true",
-            "-Dio.netty.tryReflectionSetAccessible=true",
-            "-Dio.netty.leakDetection.level=PARANOID",
-
-            // Allow hot swapping on supported JVM.
-            "-XX:+AllowEnhancedClassRedefinition",
-            "-XX:+AllowRedefinitionToAddDeleteMethods",
-            "-XX:HotswapAgent=fatjar",
-            "-Dfabric.debug.disableClassPathIsolation=true",
-
-            // Open modules for Netty.
-            "--add-opens",
-            "java.base/java.nio=ALL-UNNAMED",
-            "--add-opens",
-            "java.base/jdk.internal.misc=ALL-UNNAMED"
-        )
+        vmArgs("@../dev/args.vm.txt")
     }
     @Suppress("UnstableApiUsage") // <- I want the fancy refmap name. It's completely optional and can be removed anytime.
     mixin {
         defaultRefmapName = "gyro.mixins.refmap.json"
     }
-}
-
-repositories {
-    mavenCentral()
-    maven("https://maven.fabricmc.net/") // Fabric.
 }
 
 dependencies {

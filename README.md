@@ -69,7 +69,7 @@ under [MIT License](https://github.com/VidTu/gyro/blob/main/LICENSE))
 **A**: This mod works on the client-side.
 
 **Q**: Is this a hack?  
-**A**: It's a proof of concept. This can be counted as hack depending on your opinion on what's hack and what's not.
+**A**: It is a proof of concept. This can be counted as hack depending on your opinion on what's hack and what's not.
 
 **Q**: I've found a bug.  
 **A**: Report it [here](https://github.com/VidTu/gyro/issues). If you are not sure whether this is a bug or a
@@ -77,12 +77,12 @@ simple question, you can join the [Discord](https://discord.gg/Q6saSVSuYQ).
 Report security vulnerabilities [here](https://github.com/VidTu/gyro/security).
 
 **Q**: Can I use this in my modpack?  
-**A**: Sure. Credit (e.g. a link to mod's GitHub page) is appreciated, but is not required.
+**A**: Sure. Credit (e.g., a link to mod's GitHub page) is appreciated, but is not required.
 Monetization and redistribution are allowed as per the [MIT License](https://github.com/VidTu/gyro/blob/main/LICENSE).
 Beware: This mod may be considered a hack by some people.
 
 **Q**: Why is this mod not on the Modrinth or CurseForge?  
-**A**: It's a proof of concept and may be also considered a hack by these platforms.
+**A**: It is a proof of concept and may be also considered a hack by these platforms.
 
 ## License
 
@@ -105,9 +105,8 @@ To compile the mod from the source code:
 Run the `./gradlew runClient` command to launch the game client. You can attach a debugger to that process.
 Hotswap is supported. "Enhanced" hotswap (class redefinition) and hotswap agent will work if supported by your JVM.
 
-Running the client via generated tasks (e.g. for IntelliJ IDEA) may work, but you might need to make some adjustments
-to the "VM arguments" field to make it work properly (i.e., remove the `-Dline.separator=\n` argument, if your
-IDE can't render newlines). Launching the game directly (without Gradle) might also work, but it is also not supported.
+Running the client via generated tasks (e.g., for IntelliJ IDEA) may work, but you might need to make some adjustments.
+Launching the game directly (without Gradle) might also work, but it is also not supported.
 
 The development environment has stricter preconditions: Mixin checks, Netty detector, Java assertions, etc.
 Code with bugs might (and probably will) fail faster here than in a production environment.

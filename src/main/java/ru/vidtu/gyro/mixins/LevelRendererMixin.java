@@ -66,7 +66,7 @@ import java.util.Collection;
 // @ApiStatus.Internal // Can't annotate this without logging in the console.
 @Mixin(LevelRenderer.class)
 @NullMarked
-public class LevelRendererMixin {
+public final class LevelRendererMixin {
     /**
      * Game instance. Used for thread checking.
      *

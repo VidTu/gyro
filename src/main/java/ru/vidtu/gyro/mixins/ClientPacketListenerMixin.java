@@ -154,40 +154,35 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
     private void gyro_handleWaypoint_return(ClientboundTrackedWaypointPacket packet, CallbackInfo ci) {
         // Validate.
         assert packet != null : "gyro: Parameter 'packet' is null. (listener: " + this + ')';
+        assert this.minecraft.isSameThread() : "gyro: Receiving waypoint NOT on the main thread. (thread: " + Thread.currentThread() + ", packet: " + packet + ", listener: " + this + ')';
 
         // Log. (**TRACE**)
-        GYRO_LOGGER.trace(Gyro.GYRO_MARKER, "gyro: Received waypoint, delegating to game thread. (packet: {}, listener: {})", packet, this);
+        GYRO_LOGGER.trace(Gyro.GYRO_MARKER, "gyro: Received a waypoint. (packet: {}, listener: {})", packet, this);
 
-        // Schedule it on the minecraft thread to avoid threading issues. Don't use ensureRunningOnSameThread to avoid compat issues.
-        this.minecraft.execute(() -> {
-            // Get and push the profiler.
-            ProfilerFiller profiler = Profiler.get();
-            profiler.push("gyro:handle_waypoint_packet");
+        // Get and push the profiler.
+        ProfilerFiller profiler = Profiler.get();
+        profiler.push("gyro:handle_waypoint_packet");
 
-            // Log. (**TRACE**)
-            GYRO_LOGGER.trace(Gyro.GYRO_MARKER, "gyro: Got waypoint on the game thread. (packet: {}, listener: {})", packet, this);
+        // Extract the data.
+        TrackedWaypoint way = packet.waypoint(); // Implicit NPE for 'packet'
 
-            // Extract the data.
-            TrackedWaypoint way = packet.waypoint(); // Implicit NPE for 'packet'
+        // Depend the action on the waypoint type.
+        switch (way) {
+            // Vector waypoints basically contain the whole position. Yummy!
+            case TrackedWaypoint.Vec3iWaypoint vec -> this.gyro_handleVectorWaypoint(vec);
 
-            // Depend the action on the waypoint type.
-            switch (way) {
-                // Vector waypoints basically contain the whole position. Yummy!
-                case TrackedWaypoint.Vec3iWaypoint vec -> this.gyro_handleVectorWaypoint(vec);
+            // Chunk waypoint contain the chunk middle position. We'll use the chunk center, no better alternative.
+            case TrackedWaypoint.ChunkWaypoint chunk -> this.gyro_handleChunkWaypoint(chunk);
 
-                // Chunk waypoint contain the chunk middle position. We'll use the chunk center, no better alternative.
-                case TrackedWaypoint.ChunkWaypoint chunk -> this.gyro_handleChunkWaypoint(chunk);
+            // This is the azimuth/yaw/yRot waypoint. We assume that player stands still and calculate the position.
+            case TrackedWaypoint.AzimuthWaypoint azimuth -> this.gyro_handleAzimuthWaypoint(azimuth);
 
-                // This is the azimuth/yaw/yRot waypoint. We assume that player stands still and calculate the position.
-                case TrackedWaypoint.AzimuthWaypoint azimuth -> this.gyro_handleAzimuthWaypoint(azimuth);
+            // This is the other type of waypoint, we should remove everything.
+            default -> this.gyro_handleRemovedWaypoint(way);
+        }
 
-                // This is the other type of waypoint, we should remove everything.
-                default -> this.gyro_handleRemovedWaypoint(way);
-            }
-
-            // Pop the profiler.
-            profiler.pop();
-        });
+        // Pop the profiler.
+        profiler.pop();
     }
 
     /**
@@ -335,7 +330,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
             GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Skipping adding Azimuth waypoint, last data is the same or missing. (way: {}, id: {}, info: {}, player: {}, entity: {}, angle: {}, curData: {}, lastData: {}, listener: {})", way, id, info, player, entity, angle, curData, lastData, this);
             return;
         }
-        double lastYaw = lastData.angle();
+        float lastYaw = lastData.angle();
         double lastX = lastData.x();
         double lastZ = lastData.z();
 
@@ -420,8 +415,8 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
      * Updates the tracked positions and sends the message to the GUI.
      *
      * @param way  Updated waypoint
-     * @param x    Alleged waypoint X position
-     * @param z    Alleged waypoint Z position
+     * @param x    An alleged waypoint X position
+     * @param z    An alleged waypoint Z position
      * @param type Waypoint update type to show to player
      * @see #gyro_waypointInfo(TrackedWaypoint, boolean)
      * @see #gyro_waypointPlayerInfo(TrackedWaypoint, boolean)
@@ -488,7 +483,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
     }
 
     /**
-     * Gets the player info by waypoint, if available.
+     * Gets the player info by a waypoint, if available.
      *
      * @param way Target waypoint
      * @param dim Whether the styling should be dim
@@ -513,7 +508,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
     }
 
     /**
-     * Gets the entity info by waypoint, if available.
+     * Gets the entity info by a waypoint, if available.
      *
      * @param way Target waypoint
      * @param dim Whether the styling should be dim
