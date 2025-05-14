@@ -52,6 +52,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.vidtu.gyro.Gyro;
 import ru.vidtu.gyro.GyroRender;
+import ru.vidtu.gyro.mixins.access.GameRendererAccessor;
 
 import java.util.Collection;
 
@@ -87,13 +88,6 @@ public final class LevelRendererMixin {
     @Shadow
     @Nullable
     private ClientLevel level;
-
-    /**
-     * Fog renderer implementation. Used to disable and re-enable the fog.
-     */
-    @Shadow
-    @Final
-    private final FogRenderer fogRenderer;
 
     /**
      * An instance of this class cannot be created.
@@ -146,7 +140,8 @@ public final class LevelRendererMixin {
 
         // Disable the fog temporarily.
         GpuBufferSlice fog = RenderSystem.getShaderFog();
-        RenderSystem.setShaderFog(this.fogRenderer.getBuffer(FogRenderer.FogMode.NONE));
+        FogRenderer fogRenderer = ((GameRendererAccessor) this.minecraft.gameRenderer).gyro_fogRenderer();
+        RenderSystem.setShaderFog(fogRenderer.getBuffer(FogRenderer.FogMode.NONE));
 
         // Get the camera position.
         Vec3 cam = camera.getPosition(); // Implicit NPE for 'camera'

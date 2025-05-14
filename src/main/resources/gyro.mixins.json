@@ -10,6 +10,7 @@
     "MinecraftMixin",
     "access.AzimuthWaypointAccessor",
     "access.ChunkWaypointAccessor",
+    "access.GameRendererAccessor",
     "access.Vec3iWaypointAccessor"
   ],
   "injectors": {

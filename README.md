@@ -11,8 +11,8 @@ Abuses the newly introduced (1.21.6) Minecraft waypoint system to get player pos
 This mod has _no required dependencies_, besides the loader and the game.
 You'll need:
 
-- Fabric Loader (>=0.16.13)
-- Minecraft (25w19a)
+- Fabric Loader
+- Minecraft (25w20a)
 - Optional: Fabric API ("Fabric Resource Loader" module)
 
 Fabric API is **NOT** required, but you can install it for localization support.
