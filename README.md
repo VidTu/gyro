@@ -12,14 +12,14 @@ This mod has _no required dependencies_, besides the loader and the game.
 You'll need:
 
 - Fabric Loader
-- Minecraft (25w21a)
+- Minecraft (1.21.6-pre1)
 - Optional: Fabric API ("Fabric Resource Loader" module)
 
 Fabric API is **NOT** required, but you can install it for localization support.
 
 ## About
 
-Minecraft 1.21.6[^1] (25w15a) added a new player locator bar. Mojang made the smart decision NOT to send other players'
+Minecraft 1.21.6 (25w15a) added a new player locator bar. Mojang made the smart decision NOT to send other players'
 locations directly to everyone on the server, instead opting for a more secure system. The senders of waypoints
 are called "*sources*" (not an official name), and the receivers are called "*receivers*." (not an official name, too)
 The waypoint sending process is called a "*connection*" (that's actually an official name). This system works like this:
@@ -38,7 +38,7 @@ The waypoint sending process is called a "*connection*" (that's actually an offi
 Actually, nope. We can use some basic trigonometry already used by the speedrunning community to find strongholds
 if we assume that the *source* is standing still or doesn't move too much. The *receiver* can move around a bit,
 calculate the two tans and find their crossing point, and can pretty much find the exact *source* location.
-See this image[^2], if you're confused about how this works:
+See this image[^1], if you're confused about how this works:
 
 ![an image of two tans crossing](taninfo.png)
 
@@ -56,7 +56,7 @@ You'll need a GitHub account to download these.
 **A**: Fabric is supported. Quilt should work too.
 
 **Q**: Which Minecraft versions are supported?  
-**A**: Minecraft 25w19a. (a snapshot for 1.21.6[^1])
+**A**: Minecraft 1.21.6-pre1.
 
 **Q**: Do I need to install Fabric API or Quilt Standard Libraries?  
 **A**: No, but you can install these for other mods and/or localization support.
@@ -129,6 +129,4 @@ Reproducible release JARs are compiled with: (use these commands to create a rep
 
 Currently, no dependency (integrity) validation is performed. This might change in a future version.
 
-[^1]: Not yet confirmed to be 1.21.6.
-
-[^2]: Background map from [minecraft.wiki](https://minecraft.wiki/index.php?curid=122350).
+[^1]: Background map from [minecraft.wiki](https://minecraft.wiki/index.php?curid=122350).

@@ -24,11 +24,11 @@
 
 [versions]
 architectury-loom = "1.10.431"
-fabric-api = "0.125.0+1.21.6"
+fabric-api = "0.125.1+1.21.6"
 fabric-loader = "0.16.14"
 jetbrains-annotations = "26.0.2"
 jspecify = "1.0.0"
-minecraft = "25w21a"
+minecraft = "1.21.6-pre1"
 
 [plugins]
 architectury-loom = { id = "dev.architectury.loom", version.ref = "architectury-loom" }
