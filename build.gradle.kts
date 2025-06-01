@@ -71,9 +71,10 @@ dependencies {
 
     // Fabric.
     modImplementation(libs.fabric.loader)
-    modRuntimeOnly(fabricApi.module("fabric-resource-loader-v0", libs.fabric.api.get().version))
+    modRuntimeOnly(fabricApi.module("fabric-resource-loader-v0", libs.fabric.api.get().version)) // Loads languages.
 }
 
+// Compile with UTF-8, Java 21, and with all debug options.
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
     options.compilerArgs.addAll(listOf("-g", "-parameters"))
@@ -81,10 +82,13 @@ tasks.withType<JavaCompile> {
 }
 
 tasks.withType<ProcessResources> {
+    // Expand version.
     inputs.property("version", version)
     filesMatching("fabric.mod.json") {
         expand(inputs.properties)
     }
+
+    // Minify JSON files.
     val files = fileTree(outputs.files.asPath)
     doLast {
         files.forEach {
@@ -95,11 +99,13 @@ tasks.withType<ProcessResources> {
     }
 }
 
+// Reproducible builds.
 tasks.withType<AbstractArchiveTask> {
     isPreserveFileTimestamps = false
     isReproducibleFileOrder = true
 }
 
+// Add LICENSE and manifest into the JAR file.
 tasks.withType<Jar> {
     from(rootDir.resolve("LICENSE"))
     manifest {
@@ -114,6 +120,7 @@ tasks.withType<Jar> {
     }
 }
 
+// Minify JSON files. (after Fabric Loom processing)
 tasks.withType<RemapJarTask> {
     val minifier = UnsafeUnaryOperator<String> { Gson().fromJson(it, JsonElement::class.java).toString() }
     doLast {
