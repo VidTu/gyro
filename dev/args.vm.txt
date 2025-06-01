@@ -18,6 +18,7 @@
 -Dmixin.debug.strict.unique=true
 -Dmixin.checks=true
 -Dslf4j.internal.verbosity=DEBUG
+-Dmax.bg.threads=1
 
 -XX:+AllowEnhancedClassRedefinition
 -XX:+AllowRedefinitionToAddDeleteMethods
