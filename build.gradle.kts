@@ -48,12 +48,17 @@ repositories {
 }
 
 loom {
+    // Prepare development environment.
     accessWidenerPath = file("src/main/resources/gyro.accesswidener")
     log4jConfigs.setFrom("dev/log4j2.xml")
     silentMojangMappingsLicense()
+
+    // Setup JVM args, see that file.
     runs.named("client") {
         vmArgs("@../dev/args.vm.txt")
     }
+
+    // Set the Mixin refmap name.
     @Suppress("UnstableApiUsage") // <- I want the fancy refmap name. It's completely optional and can be removed anytime.
     mixin {
         defaultRefmapName = "gyro.mixins.refmap.json"
