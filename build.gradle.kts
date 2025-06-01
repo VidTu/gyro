@@ -61,15 +61,15 @@ loom {
 }
 
 dependencies {
-    // Annotations
+    // Annotations.
     compileOnly(libs.jspecify)
     compileOnly(libs.jetbrains.annotations)
 
-    // Minecraft
+    // Minecraft.
     minecraft(libs.minecraft)
     mappings(loom.officialMojangMappings())
 
-    // Fabric
+    // Fabric.
     modImplementation(libs.fabric.loader)
     modRuntimeOnly(fabricApi.module("fabric-resource-loader-v0", libs.fabric.api.get().version))
 }
