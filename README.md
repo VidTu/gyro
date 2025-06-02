@@ -12,7 +12,7 @@ This mod has _no required dependencies_, besides the loader and the game.
 You'll need:
 
 - Fabric Loader
-- Minecraft (1.21.6-pre1)
+- Minecraft (1.21.6-pre2)
 - Optional: Fabric API ("Fabric Resource Loader" module)
 
 Fabric API is **NOT** required, but you can install it for localization support.
@@ -56,7 +56,7 @@ You'll need a GitHub account to download these.
 **A**: Fabric is supported. Quilt should work too.
 
 **Q**: Which Minecraft versions are supported?  
-**A**: Minecraft 1.21.6-pre1.
+**A**: Minecraft 1.21.6-pre2.
 
 **Q**: Do I need to install Fabric API or Quilt Standard Libraries?  
 **A**: No, but you can install these for other mods and/or localization support.
