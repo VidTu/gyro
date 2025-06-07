@@ -201,7 +201,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
         assert this.minecraft.isSameThread() : "gyro: Handling vector waypoint NOT from the main thread. (thread: " + Thread.currentThread() + ", way: " + way + ", listener: " + this + ')';
 
         // Log. (**TRACE**)
-        Either<UUID, String> id = way.id();
+        Either<UUID, String> id = way.id(); // Implicit NPE for 'way'
         if (GYRO_LOGGER.isTraceEnabled(Gyro.GYRO_MARKER)) {
             GYRO_LOGGER.trace(Gyro.GYRO_MARKER, "gyro: Vector waypoint received, adding... (way: {}, id: {}, listener: {})", way, id, this);
         }
@@ -248,7 +248,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
         assert this.minecraft.isSameThread() : "gyro: Handling chunk waypoint NOT from the main thread. (thread: " + Thread.currentThread() + ", way: " + way + ", listener: " + this + ')';
 
         // Log. (**TRACE**)
-        Either<UUID, String> id = way.id();
+        Either<UUID, String> id = way.id(); // Implicit NPE for 'way'
         if (GYRO_LOGGER.isTraceEnabled(Gyro.GYRO_MARKER)) {
             GYRO_LOGGER.trace(Gyro.GYRO_MARKER, "gyro: Chunk waypoint received, adding... (way: {}, id: {}, listener: {})", way, id, this);
         }
@@ -293,7 +293,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
         assert this.minecraft.isSameThread() : "gyro: Handling azimuth waypoint NOT from the main thread. (thread: " + Thread.currentThread() + ", way: " + way + ", listener: " + this + ')';
 
         // Log. (**TRACE**)
-        Either<UUID, String> id = way.id();
+        Either<UUID, String> id = way.id(); // Implicit NPE for 'way'
         if (GYRO_LOGGER.isTraceEnabled(Gyro.GYRO_MARKER)) {
             GYRO_LOGGER.trace(Gyro.GYRO_MARKER, "gyro: Azimuth waypoint received, calculating... (way: {}, id: {}, listener: {})", way, id, this);
         }
@@ -389,7 +389,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
         assert this.minecraft.isSameThread() : "gyro: Handling removed waypoint NOT from the main thread. (thread: " + Thread.currentThread() + ", way: " + way + ", listener: " + this + ')';
 
         // Log. (**TRACE**)
-        Either<UUID, String> id = way.id();
+        Either<UUID, String> id = way.id(); // Implicit NPE for 'way'
         if (GYRO_LOGGER.isTraceEnabled(Gyro.GYRO_MARKER)) {
             GYRO_LOGGER.trace(Gyro.GYRO_MARKER, "gyro: Unknown (empty?) waypoint received, removing... (way: {}, id: {}, listener: {})", way, id, this);
         }
@@ -478,7 +478,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
         assert this.minecraft.isSameThread() : "gyro: Getting waypoint info NOT from the main thread. (thread: " + Thread.currentThread() + ", way: " + way + ", dim: " + dim + ", listener: " + this + ')';
 
         // Return.
-        Either<UUID, String> id = way.id();
+        Either<UUID, String> id = way.id(); // Implicit NPE for 'way'
         return Component.literal(id.right().orElseGet(() -> id.orThrow().toString())).withStyle(dim ? ChatFormatting.ITALIC : ChatFormatting.GREEN);
     }
 
@@ -501,7 +501,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
         assert this.minecraft.isSameThread() : "gyro: Getting waypoint player info NOT from the main thread. (thread: " + Thread.currentThread() + ", way: " + way + ", dim: " + dim + ", listener: " + this + ')';
 
         // Return.
-        return way.id().left()
+        return way.id().left() // Implicit NPE for 'way'
                 .map(this.playerInfoMap::get)
                 .map(info -> (Component) Component.literal(info.getProfile().getName()).withStyle(dim ? ChatFormatting.ITALIC : ChatFormatting.GREEN))
                 .orElse(dim ? GYRO_NULL_PLAYER_DIM : GYRO_NULL_PLAYER);
@@ -527,7 +527,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 
         // Return.
         ClientLevel level = this.level;
-        return way.id().left()
+        return way.id().left() // Implicit NPE for 'way'
                 .map(uuid -> (level != null) ? level.getEntity(uuid) : null)
                 .map(Entity::getDisplayName)
                 .map(name -> (Component) name.copy().withStyle(dim ? ChatFormatting.ITALIC : ChatFormatting.GREEN))
