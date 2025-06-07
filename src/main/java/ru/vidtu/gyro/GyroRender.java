@@ -1,4 +1,6 @@
 /*
+ * gyro is a third-party mod for Minecraft Java Edition that abuses the newly introduced waypoint system to get player positions.
+ *
  * MIT License
  *
  * Copyright (c) 2025 VidTu
