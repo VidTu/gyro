@@ -76,6 +76,8 @@ public final class Gyro implements ClientModInitializer {
 
     /**
      * Creates a new mod.
+     *
+     * @apiNote Do not call, called by Fabric
      */
     @Contract(pure = true)
     public Gyro() {
