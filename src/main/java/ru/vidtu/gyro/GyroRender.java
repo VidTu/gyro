@@ -28,6 +28,8 @@
 
 package ru.vidtu.gyro;
 
+import net.minecraft.util.ARGB;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
@@ -38,20 +40,39 @@ import ru.vidtu.gyro.mixins.LevelRendererMixin;
  *
  * @param x     Waypoint alleged X position
  * @param z     Waypoint alleged Z position
- * @param color Waypoint ARGB color
+ * @param color Waypoint ARGB color (always opaque)
  * @author VidTu
  * @apiNote Internal use only
  */
 @ApiStatus.Internal
 @NullMarked
 public record GyroRender(double x, double z, int color) {
+    /**
+     * Creates a new render.
+     *
+     * @param x     Waypoint alleged X position
+     * @param z     Waypoint alleged Z position
+     * @param color Waypoint ARGB color
+     */
+    @Contract(pure = true)
+    public GyroRender(double x, double z, int color) {
+        // Validate.
+        assert (x >= -Level.MAX_LEVEL_SIZE) && (x <= Level.MAX_LEVEL_SIZE) : "gyro: Parameter 'x' is not in the [-30_000_000..30_000_000] range. (x: " + x + ", z: " + z + ", color: " + color + ", data: " + this + ')';
+        assert (z >= -Level.MAX_LEVEL_SIZE) && (z <= Level.MAX_LEVEL_SIZE) : "gyro: Parameter 'z' is not in the [-30_000_000..30_000_000] range. (x: " + x + ", z: " + z + ", color: " + color + ", data: " + this + ')';
+
+        // Assign.
+        this.x = x;
+        this.z = z;
+        this.color = ARGB.opaque(color);
+    }
+
     @Contract(pure = true)
     @Override
     public String toString() {
         return "gyro/GyroRender{" +
                 "x=" + this.x +
                 ", z=" + this.z +
-                ", color=" + this.color +
+                ", color=" + this.color + " (r=" + ARGB.red(this.color) + ", g=" + ARGB.green(this.color) + ", b=" + ARGB.blue(this.color) + ')' +
                 '}';
     }
 }

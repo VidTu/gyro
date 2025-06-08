@@ -28,6 +28,8 @@
 
 package ru.vidtu.gyro;
 
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
@@ -44,12 +46,26 @@ import org.jspecify.annotations.NullMarked;
 @ApiStatus.Internal
 @NullMarked
 public record GyroData(float angle, double x, double z) {
+    /**
+     * Creates a new data.
+     *
+     * @param angle Player locator angle in radians
+     * @param x     Player X position (at the moment of receiving the angle)
+     * @param z     Player Z position (at the moment of receiving the angle)
+     */
+    @Contract(pure = true)
+    public GyroData {
+        // Validate.
+        assert (angle >= -Mth.PI) && (angle <= Mth.PI) : "gyro: Parameter 'angle' is not in the [-PI..PI] range. (angle: " + angle + ", x: " + x + ", z: " + z + ", data: " + this + ')';
+        assert (x >= -Level.MAX_LEVEL_SIZE) && (x <= Level.MAX_LEVEL_SIZE) : "gyro: Parameter 'x' is not in the [-30_000_000..30_000_000] range. (angle: " + angle + ", x: " + x + ", z: " + z + ", data: " + this + ')';
+        assert (z >= -Level.MAX_LEVEL_SIZE) && (z <= Level.MAX_LEVEL_SIZE) : "gyro: Parameter 'z' is not in the [-30_000_000..30_000_000] range. (angle: " + angle + ", x: " + x + ", z: " + z + ", data: " + this + ')';
+    }
+
     @Contract(pure = true)
     @Override
     public String toString() {
         return "gyro/GyroData{" +
-                "angle=" + this.angle +
-                ", angleDegrees=" + Math.toDegrees(this.angle) +
+                "angle=" + this.angle + " (degrees=" + Math.toDegrees(this.angle) + ')' +
                 ", x=" + this.x +
                 ", z=" + this.z +
                 '}';

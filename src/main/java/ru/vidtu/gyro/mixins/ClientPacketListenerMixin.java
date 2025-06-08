@@ -445,7 +445,8 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
                 uid -> ARGB.setBrightness(uid.hashCode(), 0.9F),
                 name -> ARGB.setBrightness(name.hashCode(), 0.9F)
         ));
-        Gyro.RENDER_POSES.put(id, new GyroRender(x, z, color));
+        GyroRender render = new GyroRender(x, z, color);
+        Gyro.RENDER_POSES.put(id, render);
 
         // Send the message.
         Component info = this.gyro_waypointInfo(way, /*dim=*/false);
@@ -460,7 +461,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 
         // Log. (**DEBUG**)
         if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) return;
-        GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Updated tracker position. (way: {}, x: {}, z: {}, type: {}, id: {}, color: {}, info: {}, player: {}, entity: {}, listener: {})", way, x, z, type, id, color, info, player, entity, this);
+        GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Updated tracker position. (way: {}, x: {}, z: {}, type: {}, id: {}, color: {}, render: {}, info: {}, player: {}, entity: {}, listener: {})", way, x, z, type, id, color, render, info, player, entity, this);
     }
 
     /**
