@@ -28,6 +28,7 @@
 
 package ru.vidtu.gyro;
 
+import com.google.errorprone.annotations.Immutable;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.ApiStatus;
@@ -37,6 +38,8 @@ import ru.vidtu.gyro.mixins.LevelRendererMixin;
 
 /**
  * A waypoint render data for {@link LevelRendererMixin}.
+ * <p>
+ * This class is immutable.
  *
  * @param x     Waypoint alleged X position
  * @param z     Waypoint alleged Z position
@@ -45,6 +48,7 @@ import ru.vidtu.gyro.mixins.LevelRendererMixin;
  * @apiNote Internal use only
  */
 @ApiStatus.Internal
+@Immutable
 @NullMarked
 public record GyroRender(double x, double z, int color) {
     /**

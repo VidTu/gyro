@@ -28,6 +28,7 @@
 
 package ru.vidtu.gyro;
 
+import com.google.errorprone.annotations.Immutable;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.ApiStatus;
@@ -36,6 +37,8 @@ import org.jspecify.annotations.NullMarked;
 
 /**
  * A player azimuth data.
+ * <p>
+ * This class is immutable.
  *
  * @param angle Player locator angle in radians
  * @param x     Player X position (at the moment of receiving the angle)
@@ -44,6 +47,7 @@ import org.jspecify.annotations.NullMarked;
  * @apiNote Internal use only
  */
 @ApiStatus.Internal
+@Immutable
 @NullMarked
 public record GyroData(float angle, double x, double z) {
     /**

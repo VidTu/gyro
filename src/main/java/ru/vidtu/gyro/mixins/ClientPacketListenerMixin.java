@@ -28,6 +28,7 @@
 
 package ru.vidtu.gyro.mixins;
 
+import com.google.errorprone.annotations.DoNotCall;
 import com.mojang.datafixers.util.Either;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.multiplayer.ClientCommonPacketListenerImpl;
@@ -149,9 +150,11 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
      *
      * @param packet Packet to extract the data from
      * @param ci     Callback data, ignored
+     * @apiNote Do not call, called by Mixin
      * @see GyroData
      * @see #gyro_updateTrackedPosition(TrackedWaypoint, double, double, String)
      */
+    @DoNotCall("Called by Mixin")
     @Inject(method = "handleWaypoint", at = @At("RETURN"))
     private void gyro_handleWaypoint_return(ClientboundTrackedWaypointPacket packet, CallbackInfo ci) {
         // Validate.

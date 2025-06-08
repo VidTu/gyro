@@ -28,6 +28,7 @@
 
 package ru.vidtu.gyro;
 
+import com.google.errorprone.annotations.DoNotCall;
 import com.mojang.datafixers.util.Either;
 import net.fabricmc.api.ClientModInitializer;
 import org.jetbrains.annotations.ApiStatus;
@@ -83,7 +84,10 @@ public final class Gyro implements ClientModInitializer {
 
     /**
      * Initializes the client. Logs the message.
+     *
+     * @apiNote Do not call, called by Fabric
      */
+    @DoNotCall("Called by Fabric")
     @Override
     public void onInitializeClient() {
         // Log.

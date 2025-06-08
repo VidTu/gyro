@@ -28,6 +28,7 @@
 
 package ru.vidtu.gyro.mixins;
 
+import com.google.errorprone.annotations.DoNotCall;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.util.profiling.Profiler;
@@ -80,9 +81,11 @@ public abstract class MinecraftMixin extends ReentrantBlockableEventLoop<Runnabl
      *
      * @param level New level, {@code null} if was unloaded, ignored
      * @param ci    Callback data, ignored
+     * @apiNote Do not call, called by Mixin
      * @see Gyro#RENDER_POSES
      * @see Gyro#ANGLES
      */
+    @DoNotCall("Called by Mixin")
     @Inject(method = "updateLevelInEngines", at = @At("RETURN"))
     private void gyro_updateLevelInEngines_return(@Nullable ClientLevel level, CallbackInfo ci) {
         // Validate.

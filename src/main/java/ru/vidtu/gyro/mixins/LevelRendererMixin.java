@@ -28,6 +28,7 @@
 
 package ru.vidtu.gyro.mixins;
 
+import com.google.errorprone.annotations.DoNotCall;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -112,10 +113,12 @@ public final class LevelRendererMixin {
      * @param camera               Current camera data
      * @param partialTick          Current partial tick (not to be confused with the tick delta)
      * @param ci                   Callback data, ignored
+     * @apiNote Do not call, called by Mixin
      * @see BeaconRenderer#BEAM_LOCATION
      * @see BeaconRenderer#renderBeaconBeam(PoseStack, MultiBufferSource, ResourceLocation, float, float, long, int, int, int, float, float)
      * @see Gyro#RENDER_POSES
      */
+    @DoNotCall("Called by Mixin")
     @Inject(method = "renderBlockEntities", at = @At("RETURN"))
     private void gyro_renderBlockEntities_return(PoseStack pose, MultiBufferSource.BufferSource source,
                                                  MultiBufferSource.BufferSource blockBreakAnimSource,

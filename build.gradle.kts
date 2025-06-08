@@ -71,6 +71,7 @@ dependencies {
     // Annotations.
     compileOnly(libs.jspecify)
     compileOnly(libs.jetbrains.annotations)
+    compileOnly(libs.error.prone.annotations)
 
     // Minecraft.
     minecraft(libs.minecraft)
