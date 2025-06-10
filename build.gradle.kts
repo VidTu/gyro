@@ -52,7 +52,7 @@ repositories {
 
 loom {
     // Prepare development environment.
-    accessWidenerPath = file("src/main/resources/gyro.accesswidener")
+    accessWidenerPath = file("src/main/resources/gyro.aw")
     log4jConfigs.setFrom("dev/log4j2.xml")
     silentMojangMappingsLicense()
 

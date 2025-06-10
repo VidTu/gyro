@@ -22,7 +22,7 @@
       "ru.vidtu.gyro.Gyro"
     ]
   },
-  "accessWidener": "gyro.accesswidener",
+  "accessWidener": "gyro.aw",
   "mixins": [
     "gyro.mixins.json"
   ],
