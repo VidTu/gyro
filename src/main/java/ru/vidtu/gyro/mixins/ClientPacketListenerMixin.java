@@ -398,7 +398,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
         if (distSquared <= GYRO_MINIMUM_AZIMUTH_DISTANCE_SQUARE) {
             // Log, stop. (**DEBUG**)
             if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) return;
-            GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Skipping adding Azimuth waypoint, the calculated position is too close. (way: {}, id: {}, info: {}, player: {}, entity: {}, angle: {}, curData: {}, lastData: {}, curInvTan: {}, lastInvTan: {}, curCross: {}, lastCross: {}, x: {}, z: {}, diffX: {}, diffZ: {}, distSqr: {}, listener: {})", way, id, info, player, entity, angle, curData, lastData, curInvTan, lastInvTan, curCross, lastCross, x, z, diffX, diffZ, distSquared, this);
+            GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Skipping adding Azimuth waypoint, the calculated position is too close. (way: {}, id: {}, info: {}, player: {}, entity: {}, angle: {}, curData: {}, lastData: {}, curInvTan: {}, lastInvTan: {}, curCross: {}, lastCross: {}, x: {}, z: {}, diffX: {}, diffZ: {}, distSquared: {}, listener: {})", way, id, info, player, entity, angle, curData, lastData, curInvTan, lastInvTan, curCross, lastCross, x, z, diffX, diffZ, distSquared, this);
             return;
         }
 
@@ -407,7 +407,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 
         // Log. (**DEBUG**)
         if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) return;
-        GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Calculated and added Azimuth waypoint. (way: {}, id: {}, info: {}, player: {}, entity: {}, angle: {}, curData: {}, lastData: {}, curInvTan: {}, lastInvTan: {}, curCross: {}, lastCross: {}, x: {}, z: {}, diffX: {}, diffZ: {}, distSqr: {}, listener: {})", way, id, info, player, entity, angle, curData, lastData, curInvTan, lastInvTan, curCross, lastCross, x, z, diffX, diffZ, distSquared, this);
+        GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Calculated and added Azimuth waypoint. (way: {}, id: {}, info: {}, player: {}, entity: {}, angle: {}, curData: {}, lastData: {}, curInvTan: {}, lastInvTan: {}, curCross: {}, lastCross: {}, x: {}, z: {}, diffX: {}, diffZ: {}, distSquared: {}, listener: {})", way, id, info, player, entity, angle, curData, lastData, curInvTan, lastInvTan, curCross, lastCross, x, z, diffX, diffZ, distSquared, this);
     }
 
     /**
