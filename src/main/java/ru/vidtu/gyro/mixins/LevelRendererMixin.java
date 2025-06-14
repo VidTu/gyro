@@ -51,6 +51,7 @@ import org.jspecify.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -72,6 +73,18 @@ import java.util.Collection;
 @Mixin(LevelRenderer.class)
 @NullMarked
 public final class LevelRendererMixin {
+    /**
+     * Maximum distance to the beacon beam in blocks,
+     * after which its apparent size will be fixed.
+     * <p>
+     * Equals to {@code 48} blocks.
+     *
+     * @see BeaconRenderer
+     * @see #gyro_renderBlockEntities_return(PoseStack, MultiBufferSource.BufferSource, MultiBufferSource.BufferSource, Camera, float, CallbackInfo)
+     */
+    @Unique
+    private static final double GYRO_BEACON_BEAM_SCALE_THRESHOLD = 48.0D;
+
     /**
      * Game instance. Used for thread checking.
      *
@@ -167,7 +180,7 @@ public final class LevelRendererMixin {
             pose.translate(x, 0.0D, z);
 
             // Scale and render.
-            float scale = Math.max(1.0F, (float) (Math.sqrt((x * x) + (z * z)) / 48.0D));
+            float scale = Math.max(1.0F, (float) (Math.sqrt((x * x) + (z * z)) / GYRO_BEACON_BEAM_SCALE_THRESHOLD));
             BeaconRenderer.renderBeaconBeam(pose, source, BeaconRenderer.BEAM_LOCATION, partialTick, /*textureDensity=*/1.0F, level.getGameTime(), -(BeaconRenderer.MAX_RENDER_Y / 2), BeaconRenderer.MAX_RENDER_Y, pos.color(), BeaconRenderer.SOLID_BEAM_RADIUS * scale, BeaconRenderer.BEAM_GLOW_RADIUS * scale); // Implicit NPE for 'source', 'level'
 
             // Pop.

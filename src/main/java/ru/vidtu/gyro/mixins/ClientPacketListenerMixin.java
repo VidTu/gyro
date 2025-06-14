@@ -32,6 +32,7 @@ package ru.vidtu.gyro.mixins;
 import com.google.errorprone.annotations.DoNotCall;
 import com.mojang.datafixers.util.Either;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.contextualbar.LocatorBarRenderer;
 import net.minecraft.client.multiplayer.ClientCommonPacketListenerImpl;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
@@ -46,6 +47,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.waypoints.TrackedWaypoint;
+import net.minecraft.world.waypoints.WaypointTransmitter;
 import org.jetbrains.annotations.Contract;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -80,6 +82,30 @@ import java.util.UUID;
 @Mixin(ClientPacketListener.class)
 @NullMarked
 public abstract class ClientPacketListenerMixin extends ClientCommonPacketListenerImpl {
+    /**
+     * Minimum squared distance (Euclidean distance without the sqrt) to an
+     * azimuth waypoint for its position to be displayed to the user.
+     * <p>
+     * Equals to {@link WaypointTransmitter#REALLY_FAR_DISTANCE} squared as this
+     * is the minimum distance the vanilla server will use the Azimuth waypoints.
+     *
+     * @see WaypointTransmitter#REALLY_FAR_DISTANCE
+     * @see #gyro_handleAzimuthWaypoint(TrackedWaypoint.AzimuthWaypoint)
+     */
+    @Unique
+    private static final int GYRO_MINIMUM_AZIMUTH_DISTANCE_SQUARE = (WaypointTransmitter.REALLY_FAR_DISTANCE * WaypointTransmitter.REALLY_FAR_DISTANCE);
+
+    /**
+     * Minimum allowed Waypoint brightness by vanilla. A vanilla constant.
+     * <p>
+     * Equals to {@code 0.9} (or 90%), see {@link LocatorBarRenderer}.
+     *
+     * @see LocatorBarRenderer
+     * @see #gyro_updateTrackedPosition(TrackedWaypoint, double, double, String)
+     */
+    @Unique
+    private static final float GYRO_WAYPOINT_BRIGHTNESS = 0.9F;
+
     /**
      * Logger for this class.
      */
@@ -341,16 +367,20 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
         double lastZ = lastData.z();
 
         // Calculate the tangents to the player.
+        // https://en.wikipedia.org/wiki/Tangent
         double curInvTan = (-1.0D / Math.tan(curYaw));
         double lastInvTan = (-1.0D / Math.tan(lastYaw));
         double curCross = (curZ - (curX * curInvTan));
         double lastCross = (lastZ - (lastX * lastInvTan));
 
         // Calculate the position based on tangents cross-point.
+        // https://en.wikipedia.org/wiki/Tangent_lines_to_circles
         double x = ((lastCross - curCross) / (curInvTan - lastInvTan));
         double z = ((x * curInvTan) + curCross);
 
-        // If the position is unrealistic, the other player is probably moving.
+        // If the position is unrealistic, the other player is probably moving. MAX_LEVEL_SIZE
+        // is 30 million, the **HARD** vanilla world border. (aka the world boundary)
+        // https://minecraft.wiki/w/World_boundary
         if ((x <= -Level.MAX_LEVEL_SIZE) || (z <= -Level.MAX_LEVEL_SIZE) ||
                 (x >= Level.MAX_LEVEL_SIZE) || (z >= Level.MAX_LEVEL_SIZE)) {
             // Log, stop. (**DEBUG**)
@@ -361,13 +391,14 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 
         // Calculate the Euclidean distance and ignore if it's too close.
         // This is a hack for moving player that forces THEM to recalculate OUR position.
+        // https://en.wikipedia.org/wiki/Euclidean_distance
         double diffX = (curX - x);
         double diffZ = (curZ - z);
-        double distSqr = ((diffX * diffX) + (diffZ * diffZ));
-        if (distSqr <= (8 * 8)) {
+        double distSquared = ((diffX * diffX) + (diffZ * diffZ));
+        if (distSquared <= GYRO_MINIMUM_AZIMUTH_DISTANCE_SQUARE) {
             // Log, stop. (**DEBUG**)
             if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) return;
-            GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Skipping adding Azimuth waypoint, the calculated position is too close. (way: {}, id: {}, info: {}, player: {}, entity: {}, angle: {}, curData: {}, lastData: {}, curInvTan: {}, lastInvTan: {}, curCross: {}, lastCross: {}, x: {}, z: {}, diffX: {}, diffZ: {}, distSqr: {}, listener: {})", way, id, info, player, entity, angle, curData, lastData, curInvTan, lastInvTan, curCross, lastCross, x, z, diffX, diffZ, distSqr, this);
+            GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Skipping adding Azimuth waypoint, the calculated position is too close. (way: {}, id: {}, info: {}, player: {}, entity: {}, angle: {}, curData: {}, lastData: {}, curInvTan: {}, lastInvTan: {}, curCross: {}, lastCross: {}, x: {}, z: {}, diffX: {}, diffZ: {}, distSqr: {}, listener: {})", way, id, info, player, entity, angle, curData, lastData, curInvTan, lastInvTan, curCross, lastCross, x, z, diffX, diffZ, distSquared, this);
             return;
         }
 
@@ -376,7 +407,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
 
         // Log. (**DEBUG**)
         if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) return;
-        GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Calculated and added Azimuth waypoint. (way: {}, id: {}, info: {}, player: {}, entity: {}, angle: {}, curData: {}, lastData: {}, curInvTan: {}, lastInvTan: {}, curCross: {}, lastCross: {}, x: {}, z: {}, diffX: {}, diffZ: {}, distSqr: {}, listener: {})", way, id, info, player, entity, angle, curData, lastData, curInvTan, lastInvTan, curCross, lastCross, x, z, diffX, diffZ, distSqr, this);
+        GYRO_LOGGER.debug(Gyro.GYRO_MARKER, "gyro: Calculated and added Azimuth waypoint. (way: {}, id: {}, info: {}, player: {}, entity: {}, angle: {}, curData: {}, lastData: {}, curInvTan: {}, lastInvTan: {}, curCross: {}, lastCross: {}, x: {}, z: {}, diffX: {}, diffZ: {}, distSqr: {}, listener: {})", way, id, info, player, entity, angle, curData, lastData, curInvTan, lastInvTan, curCross, lastCross, x, z, diffX, diffZ, distSquared, this);
     }
 
     /**
@@ -446,8 +477,8 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
         // Calculate the color and put into rendering positions.
         Either<UUID, String> id = way.id(); // Implicit NPE for 'way'
         int color = way.icon().color.orElseGet(() -> id.map(
-                uid -> ARGB.setBrightness(uid.hashCode(), 0.9F),
-                name -> ARGB.setBrightness(name.hashCode(), 0.9F)
+                uid -> ARGB.setBrightness(uid.hashCode(), GYRO_WAYPOINT_BRIGHTNESS),
+                name -> ARGB.setBrightness(name.hashCode(), GYRO_WAYPOINT_BRIGHTNESS)
         ));
         GyroRender render = new GyroRender(x, z, color);
         Gyro.RENDER_POSES.put(id, render);
