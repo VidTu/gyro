@@ -29,6 +29,7 @@
 
 package ru.vidtu.gyro.mixins;
 
+import com.google.errorprone.annotations.CompileTimeConstant;
 import com.google.errorprone.annotations.DoNotCall;
 import com.mojang.datafixers.util.Either;
 import net.minecraft.ChatFormatting;
@@ -93,6 +94,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
      * @see #gyro_handleAzimuthWaypoint(TrackedWaypoint.AzimuthWaypoint)
      */
     @Unique
+    @CompileTimeConstant
     private static final int GYRO_MINIMUM_AZIMUTH_DISTANCE_SQUARE = (WaypointTransmitter.REALLY_FAR_DISTANCE * WaypointTransmitter.REALLY_FAR_DISTANCE);
 
     /**
@@ -104,6 +106,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
      * @see #gyro_updateTrackedPosition(TrackedWaypoint, double, double, String)
      */
     @Unique
+    @CompileTimeConstant
     private static final float GYRO_WAYPOINT_BRIGHTNESS = 0.9F;
 
     /**

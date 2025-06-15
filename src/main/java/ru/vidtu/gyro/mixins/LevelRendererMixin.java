@@ -29,6 +29,7 @@
 
 package ru.vidtu.gyro.mixins;
 
+import com.google.errorprone.annotations.CompileTimeConstant;
 import com.google.errorprone.annotations.DoNotCall;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -83,6 +84,7 @@ public final class LevelRendererMixin {
      * @see #gyro_renderBlockEntities_return(PoseStack, MultiBufferSource.BufferSource, MultiBufferSource.BufferSource, Camera, float, CallbackInfo)
      */
     @Unique
+    @CompileTimeConstant
     private static final double GYRO_BEACON_BEAM_SCALE_THRESHOLD = 48.0D;
 
     /**
