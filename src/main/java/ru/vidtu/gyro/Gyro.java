@@ -82,7 +82,7 @@ public final class Gyro implements ClientModInitializer {
      */
     @Contract(pure = true)
     public Gyro() {
-        // Empty
+        // Empty.
     }
 
     /**
