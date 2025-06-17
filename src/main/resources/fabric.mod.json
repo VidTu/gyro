@@ -27,7 +27,7 @@
     "gyro.mixins.json"
   ],
   "depends": {
-    "minecraft": "1.21.6-rc.1"
+    "minecraft": "1.21.6"
   },
   "recommends": {
     "fabric-resource-loader-v0": "*"

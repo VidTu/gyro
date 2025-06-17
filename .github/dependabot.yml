@@ -37,3 +37,4 @@ updates:
       interval: daily
     ignore:
       - dependency-name: "com.mojang:minecraft"
+      - dependency-name: "net.fabricmc.fabric-api:fabric-api"

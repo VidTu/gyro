@@ -5,7 +5,10 @@
   ],
   "packageRules": [
     {
-      "matchPackageNames": ["com.mojang:minecraft"],
+      "matchPackageNames": [
+        "com.mojang:minecraft",
+        "net.fabricmc.fabric-api:fabric-api"
+      ],
       "enabled": false
     }
   ]
