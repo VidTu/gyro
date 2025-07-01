@@ -43,7 +43,7 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 group = "ru.vidtu.gyro"
 base.archivesName = "gyro"
-description = "Abuses the newly introduced (1.21.6) Minecraft waypoint system to get player positions."
+description = "Abuses the Minecraft waypoint system (added in 1.21.6) to get player positions."
 
 repositories {
     mavenCentral()
