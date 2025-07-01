@@ -9,6 +9,6 @@
   "gyro.status.null": "Удалён маячок %s (player: %s, entity: %s).",
   "gyro.null.player": "<не найден>",
   "gyro.null.entity": "<не найдена>",
-  "modmenu.descriptionTranslation.modmenu": "Использует новую (1.21.6) систему маячков в Minecraft для получения позиций игроков.",
+  "modmenu.descriptionTranslation.modmenu": "Использует систему маячков Minecraft (добавлена в 1.21.6) для получения позиций игроков.",
   "modmenu.summaryTranslation.modmenu": "Получает позиции игроков через локатор игроков."
 }

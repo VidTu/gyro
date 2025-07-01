@@ -3,7 +3,7 @@
   "id": "gyro",
   "version": "${version}",
   "name": "gyro",
-  "description": "Abuses the newly introduced (1.21.6) Minecraft waypoint system to get player positions.",
+  "description": "Abuses the Minecraft waypoint system (added in 1.21.6) to get player positions.",
   "authors": [
     "VidTu"
   ],
@@ -27,7 +27,7 @@
     "gyro.mixins.json"
   ],
   "depends": {
-    "minecraft": "1.21.7-rc.2"
+    "minecraft": "1.21.7"
   },
   "recommends": {
     "fabric-resource-loader-v0": "*"

@@ -9,6 +9,6 @@
   "gyro.status.null": "Deleted waypoint %s (player: %s, entity: %s).",
   "gyro.null.player": "<not found>",
   "gyro.null.entity": "<not found>",
-  "modmenu.descriptionTranslation.modmenu": "Abuses the newly introduced (1.21.6) Minecraft waypoint system to get player positions.",
+  "modmenu.descriptionTranslation.modmenu": "Abuses the Minecraft waypoint system (added in 1.21.6) to get player positions.",
   "modmenu.summaryTranslation.modmenu": "Gets player positions via player locator."
 }
