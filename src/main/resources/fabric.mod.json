@@ -24,7 +24,10 @@
   },
   "accessWidener": "gyro.aw",
   "mixins": [
-    "gyro.mixins.json"
+    {
+      "config": "gyro.mixins.json",
+      "environment": "client"
+    }
   ],
   "depends": {
     "minecraft": "1.21.7"
