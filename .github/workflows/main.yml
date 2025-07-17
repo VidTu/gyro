@@ -32,8 +32,8 @@ on:
     branches: [ 'main' ]
   workflow_dispatch:
 jobs:
-  build:
-    name: 'Build'
+  main:
+    name: 'Build (Main)'
     runs-on: 'ubuntu-24.04'
     timeout-minutes: 20
     permissions:
