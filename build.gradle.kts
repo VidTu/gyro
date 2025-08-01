@@ -108,12 +108,6 @@ tasks.withType<ProcessResources> {
     }
 }
 
-// Reproducible builds.
-tasks.withType<AbstractArchiveTask> {
-    isPreserveFileTimestamps = false
-    isReproducibleFileOrder = true
-}
-
 // Add LICENSE and manifest into the JAR file.
 tasks.withType<Jar> {
     from(rootDir.resolve("LICENSE"))
