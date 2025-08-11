@@ -30,7 +30,7 @@
     }
   ],
   "depends": {
-    "minecraft": "1.21.9-alpha.25.31.a"
+    "minecraft": "1.21.9-alpha.25.32.a"
   },
   "recommends": {
     "fabric-resource-loader-v0": "*"
