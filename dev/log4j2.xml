@@ -31,7 +31,7 @@
             <PatternLayout pattern="%style{[%d{HH:mm:ss}]}{blue} %highlight{[%t/%level]}{FATAL=bright_red, ERROR=red, WARN=yellow, INFO=green, DEBUG=bright_white, TRACE=white}: %style{(%logger{0})}{cyan} %style{&lt;%marker&gt;}{magenta} %msg{nolookups}%n%xEx{full}" disableAnsi="false"/>
         </Console>
         <RollingRandomAccessFile name="File" fileName="logs/latest.log" filePattern="logs/%d{yyyy-MM-dd}-%i.log.gz" immediateFlush="false">
-            <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level]: (%logger{0}) &lt;%marker&gt; %msg{nolookups}%n%xEx{full}"/>
+            <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level]: (%logger{0}) &lt;%marker&gt; %msg{nolookups}%n%xEx{full}" disableAnsi="true"/>
             <Policies>
                 <TimeBasedTriggeringPolicy/>
                 <OnStartupTriggeringPolicy/>

@@ -344,7 +344,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
                 .withStyle(ChatFormatting.GRAY));
 
         // Get the player.
-        Entity camera = this.minecraft.cameraEntity;
+        Entity camera = this.minecraft.getCameraEntity();
         if (camera == null) {
             // Log, stop. (**DEBUG**)
             if (!GYRO_LOGGER.isDebugEnabled(Gyro.GYRO_MARKER)) return;
