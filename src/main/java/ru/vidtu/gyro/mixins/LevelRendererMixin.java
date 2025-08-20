@@ -38,7 +38,8 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.blockentity.BeaconRenderer;
 import net.minecraft.client.renderer.fog.FogRenderer;
 import net.minecraft.resources.ResourceLocation;
@@ -81,7 +82,7 @@ public final class LevelRendererMixin {
      * Equals to {@code 48} blocks.
      *
      * @see BeaconRenderer
-     * @see #gyro_renderBlockEntities_return(PoseStack, MultiBufferSource.BufferSource, MultiBufferSource.BufferSource, Camera, float, CallbackInfo)
+     * @see #gyro_renderBlockEntities_return(PoseStack, Camera, float, CallbackInfo)
      */
     @Unique
     @CompileTimeConstant
@@ -90,19 +91,28 @@ public final class LevelRendererMixin {
     /**
      * Game instance. Used for thread checking.
      *
-     * @see #gyro_renderBlockEntities_return(PoseStack, MultiBufferSource.BufferSource, MultiBufferSource.BufferSource, Camera, float, CallbackInfo)
+     * @see #gyro_renderBlockEntities_return(PoseStack, Camera, float, CallbackInfo)
      */
     @Shadow
     @Final
     private final Minecraft minecraft;
 
     /**
+     * Render node request submission collector. Used to upload beacon beams to.
+     *
+     * @see #gyro_renderBlockEntities_return(PoseStack, Camera, float, CallbackInfo)
+     */
+    @Shadow
+    @Final
+    private SubmitNodeStorage submitNodeStorage;
+
+    /**
      * Current level, used to retrieve game time, which is basically useless for our needs but is an argument for
      * beacon beam renderer by convention even tho our beams are eternal. It's probably for animation too, not tested.
      *
-     * @see #gyro_renderBlockEntities_return(PoseStack, MultiBufferSource.BufferSource, MultiBufferSource.BufferSource, Camera, float, CallbackInfo)
+     * @see #gyro_renderBlockEntities_return(PoseStack, Camera, float, CallbackInfo)
      * @see Level#getGameTime()
-     * @see BeaconRenderer#renderBeaconBeam(PoseStack, MultiBufferSource, ResourceLocation, float, float, long, int, int, int, float, float)
+     * @see BeaconRenderer#submitBeaconBeam(PoseStack, SubmitNodeCollector, ResourceLocation, float, float, long, int, int, int, float, float)
      */
     @Shadow
     @Nullable
@@ -123,29 +133,23 @@ public final class LevelRendererMixin {
     /**
      * Handles the beacon beam rendering for {@link Gyro#RENDER_POSES}.
      *
-     * @param pose                 The current pose stack
-     * @param source               Buffer rendering source
-     * @param blockBreakAnimSource Buffer rendering source for rendering the block breaking overlay, ignored
-     * @param camera               Current camera data
-     * @param partialTick          Current partial tick (not to be confused with the tick delta)
-     * @param ci                   Callback data, ignored
+     * @param pose        The current pose stack
+     * @param camera      Current camera data
+     * @param partialTick Current partial tick (not to be confused with the tick delta)
+     * @param ci          Callback data, ignored
      * @apiNote Do not call, called by Mixin
      * @see BeaconRenderer#BEAM_LOCATION
-     * @see BeaconRenderer#renderBeaconBeam(PoseStack, MultiBufferSource, ResourceLocation, float, float, long, int, int, int, float, float)
+     * @see BeaconRenderer#submitBeaconBeam(PoseStack, SubmitNodeCollector, ResourceLocation, float, float, long, int, int, int, float, float)
      * @see Gyro#RENDER_POSES
      */
     @DoNotCall("Called by Mixin")
     @Inject(method = "renderBlockEntities", at = @At("RETURN"))
-    private void gyro_renderBlockEntities_return(PoseStack pose, MultiBufferSource.BufferSource source,
-                                                 MultiBufferSource.BufferSource blockBreakAnimSource,
-                                                 Camera camera, float partialTick, CallbackInfo ci) {
+    private void gyro_renderBlockEntities_return(PoseStack pose, Camera camera, float partialTick, CallbackInfo ci) {
         // Validate.
-        assert pose != null : "gyro: Parameter 'pose' is null. (source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", partialTick: " + partialTick + ", renderer: " + this + ')';
-        assert source != null : "gyro: Parameter 'source' is null. (pose: " + pose + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", partialTick: " + partialTick + ", renderer: " + this + ')';
-        assert blockBreakAnimSource != null : "gyro: Parameter 'blockBreakAnimSource' is null. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", partialTick: " + partialTick + ", renderer: " + this + ')';
-        assert camera != null : "gyro: Parameter 'camera' is null. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", partialTick: " + partialTick + ", renderer: " + this + ')';
-        assert (partialTick >= 0.0F) && (partialTick <= 1.0F) : "gyro: Parameter 'partialTick' is not in the [0..1] range. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", partialTick: " + partialTick + ", renderer: " + this + ')';
-        assert this.minecraft.isSameThread() : "gyro: Rendering block entities NOT from the main thread. (thread: " + Thread.currentThread() + ", pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", partialTick: " + partialTick + ", renderer: " + this + ')';
+        assert pose != null : "gyro: Parameter 'pose' is null. (camera: " + camera + ", partialTick: " + partialTick + ", renderer: " + this + ')';
+        assert camera != null : "gyro: Parameter 'camera' is null. (pose: " + pose + ", partialTick: " + partialTick + ", renderer: " + this + ')';
+        assert (partialTick >= 0.0F) && (partialTick <= 1.0F) : "gyro: Parameter 'partialTick' is not in the [0..1] range. (pose: " + pose + ", camera: " + camera + ", partialTick: " + partialTick + ", renderer: " + this + ')';
+        assert this.minecraft.isSameThread() : "gyro: Rendering block entities NOT from the main thread. (thread: " + Thread.currentThread() + ", pose: " + pose + ", camera: " + camera + ", partialTick: " + partialTick + ", renderer: " + this + ')';
 
         // Get and push the profiler.
         ProfilerFiller profiler = Profiler.get();
@@ -171,7 +175,10 @@ public final class LevelRendererMixin {
 
         // Extract the level.
         ClientLevel level = this.level;
-        assert level != null : "gyro: Rendering block entities without a client level. (pose: " + pose + ", source: " + source + ", blockBreakAnimSource: " + blockBreakAnimSource + ", camera: " + camera + ", partialTick: " + partialTick + ", renderer: " + this + ')';
+        assert level != null : "gyro: Rendering block entities without a client level. (pose: " + pose + ", camera: " + camera + ", partialTick: " + partialTick + ", renderer: " + this + ')';
+
+        // Extract the collector.
+        SubmitNodeStorage collector = this.submitNodeStorage;
 
         // Render each pos as a beam.
         for (GyroRender pos : poses) {
@@ -183,7 +190,7 @@ public final class LevelRendererMixin {
 
             // Scale and render.
             float scale = Math.max(1.0F, (float) (Math.sqrt((x * x) + (z * z)) / GYRO_BEACON_BEAM_SCALE_THRESHOLD));
-            BeaconRenderer.renderBeaconBeam(pose, source, BeaconRenderer.BEAM_LOCATION, partialTick, /*textureDensity=*/1.0F, level.getGameTime(), -(BeaconRenderer.MAX_RENDER_Y / 2), BeaconRenderer.MAX_RENDER_Y, pos.color(), BeaconRenderer.SOLID_BEAM_RADIUS * scale, BeaconRenderer.BEAM_GLOW_RADIUS * scale); // Implicit NPE for 'source', 'level'
+            BeaconRenderer.submitBeaconBeam(pose, collector, BeaconRenderer.BEAM_LOCATION, partialTick, /*textureDensity=*/1.0F, level.getGameTime(), -(BeaconRenderer.MAX_RENDER_Y / 2), BeaconRenderer.MAX_RENDER_Y, pos.color(), BeaconRenderer.SOLID_BEAM_RADIUS * scale, BeaconRenderer.BEAM_GLOW_RADIUS * scale); // Implicit NPE for 'source', 'level'
 
             // Pop.
             pose.popPose();
