@@ -544,7 +544,7 @@ public abstract class ClientPacketListenerMixin extends ClientCommonPacketListen
         // Return.
         return way.id().left() // Implicit NPE for 'way'
                 .map(this.playerInfoMap::get)
-                .map(info -> (Component) Component.literal(info.getProfile().getName()).withStyle(dim ? ChatFormatting.ITALIC : ChatFormatting.GREEN))
+                .map(info -> (Component) Component.literal(info.getProfile().name()).withStyle(dim ? ChatFormatting.ITALIC : ChatFormatting.GREEN))
                 .orElse(dim ? GYRO_NULL_PLAYER_DIM : GYRO_NULL_PLAYER);
     }
 
