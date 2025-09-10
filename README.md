@@ -1,3 +1,16 @@
+> [!WARNING]
+> **The release for the Copper Age drop (alledged to be 1.21.9)
+> and its hotfixes will be the last for the gyro mod.**
+>
+> This mod has shown various vulnerabilities of the Minecraft waypoint system
+> and worked fine for a "proof-of-concept" type of a mod. These concerns were
+> never addressed (and maybe shouldn't've been), now the real hacks (hack/cheat
+> clients) have started to abuse the waypoint system to get player positions in
+> more sophisticated ways. Use a real hack client if you need the functionality
+> of this mod on any server.
+>
+> *This mod will be archived (and eventually deleted) after the 1.21.9 release.*
+
 # gyro
 
 Abuses the Minecraft waypoint system (added in 1.21.6) to get player positions.
