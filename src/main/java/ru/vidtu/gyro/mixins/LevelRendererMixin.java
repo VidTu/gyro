@@ -34,15 +34,14 @@ import com.google.errorprone.annotations.DoNotCall;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.LevelRenderState;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.blockentity.BeaconRenderer;
 import net.minecraft.client.renderer.fog.FogRenderer;
+import net.minecraft.client.renderer.state.LevelRenderState;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.profiling.Profiler;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -83,7 +82,7 @@ public final class LevelRendererMixin {
      * Equals to {@code 48} blocks.
      *
      * @see BeaconRenderer
-     * @see #gyro_submitBlockEntities_return(PoseStack, Camera, LevelRenderState, SubmitNodeStorage, CallbackInfo)
+     * @see #gyro_submitBlockEntities_return(PoseStack, LevelRenderState, SubmitNodeStorage, CallbackInfo)
      */
     @Unique
     @CompileTimeConstant
@@ -95,7 +94,7 @@ public final class LevelRendererMixin {
      * Equals to {@code 40} ticks.
      *
      * @see BeaconRenderer#submitBeaconBeam(PoseStack, SubmitNodeCollector, ResourceLocation, float, float, int, int, int, float, float)
-     * @see #gyro_submitBlockEntities_return(PoseStack, Camera, LevelRenderState, SubmitNodeStorage, CallbackInfo)
+     * @see #gyro_submitBlockEntities_return(PoseStack,  LevelRenderState, SubmitNodeStorage, CallbackInfo)
      */
     @Unique
     @CompileTimeConstant
@@ -104,7 +103,7 @@ public final class LevelRendererMixin {
     /**
      * Game instance. Used for thread checking.
      *
-     * @see #gyro_submitBlockEntities_return(PoseStack, Camera, LevelRenderState, SubmitNodeStorage, CallbackInfo)
+     * @see #gyro_submitBlockEntities_return(PoseStack, LevelRenderState, SubmitNodeStorage, CallbackInfo)
      */
     @Shadow
     @Final
@@ -114,7 +113,7 @@ public final class LevelRendererMixin {
      * Current level, used to retrieve game time, which is basically useless for our needs but is an argument for
      * beacon beam renderer by convention even tho our beams are eternal. It's probably for animation too, not tested.
      *
-     * @see #gyro_submitBlockEntities_return(PoseStack, Camera, LevelRenderState, SubmitNodeStorage, CallbackInfo)
+     * @see #gyro_submitBlockEntities_return(PoseStack, LevelRenderState, SubmitNodeStorage, CallbackInfo)
      * @see Level#getGameTime()
      * @see BeaconRenderer#submitBeaconBeam(PoseStack, SubmitNodeCollector, ResourceLocation, float, float, int, int, int, float, float)
      */
@@ -137,10 +136,9 @@ public final class LevelRendererMixin {
     /**
      * Handles the beacon beam rendering for {@link Gyro#RENDER_POSES}.
      *
-     * @param pose        The current pose stack
-     * @param camera      Current camera data
+     * @param pose  The current pose stack
      * @param state Current game rendering state
-     * @param ci          Callback data, ignored
+     * @param ci    Callback data, ignored
      * @apiNote Do not call, called by Mixin
      * @see BeaconRenderer#BEAM_LOCATION
      * @see BeaconRenderer#submitBeaconBeam(PoseStack, SubmitNodeCollector, ResourceLocation, float, float, int, int, int, float, float)
@@ -148,13 +146,12 @@ public final class LevelRendererMixin {
      */
     @DoNotCall("Called by Mixin")
     @Inject(method = "submitBlockEntities", at = @At("RETURN"))
-    private void gyro_submitBlockEntities_return(PoseStack pose, Camera camera, LevelRenderState state, SubmitNodeStorage storage, CallbackInfo ci) {
+    private void gyro_submitBlockEntities_return(PoseStack pose, LevelRenderState state, SubmitNodeStorage storage, CallbackInfo ci) {
         // Validate.
-        assert pose != null : "gyro: Parameter 'pose' is null. (camera: " + camera + ", state: " + state + ", storage: " + storage + ", renderer: " + this + ')';
-        assert camera != null : "gyro: Parameter 'camera' is null. (pose: " + pose + ", state: " + state + ", storage: " + storage + ", renderer: " + this + ')';
-        assert state != null : "gyro: Parameter 'state' is null. (camera: " + camera + ", pose: " + pose + ", storage: " + storage + ", renderer: " + this + ')';
-        assert storage != null : "gyro: Parameter 'storage' is null. (camera: " + camera + ", pose: " + pose + ", state: " + state + ", renderer: " + this + ')';
-        assert this.minecraft.isSameThread() : "gyro: Rendering block entities NOT from the main thread. (thread: " + Thread.currentThread() + ", pose: " + pose + ", camera: " + camera + ", state: " + state + ", storage: " + storage + ", renderer: " + this + ')';
+        assert pose != null : "gyro: Parameter 'pose' is null. (state: " + state + ", storage: " + storage + ", renderer: " + this + ')';
+        assert state != null : "gyro: Parameter 'state' is null. (pose: " + pose + ", storage: " + storage + ", renderer: " + this + ')';
+        assert storage != null : "gyro: Parameter 'storage' is null. (pose: " + pose + ", state: " + state + ", renderer: " + this + ')';
+        assert this.minecraft.isSameThread() : "gyro: Rendering block entities NOT from the main thread. (thread: " + Thread.currentThread() + ", pose: " + pose + ", state: " + state + ", storage: " + storage + ", renderer: " + this + ')';
 
         // Get and push the profiler.
         ProfilerFiller profiler = Profiler.get();
@@ -174,13 +171,13 @@ public final class LevelRendererMixin {
         RenderSystem.setShaderFog(fogRenderer.getBuffer(FogRenderer.FogMode.NONE));
 
         // Get the camera position.
-        Vec3 cam = camera.getPosition(); // Implicit NPE for 'camera'
+        Vec3 cam = state.cameraRenderState.pos; // Implicit NPE for 'state'
         double cx = cam.x();
         double cz = cam.z();
 
         // Extract the level.
         ClientLevel level = this.level;
-        assert level != null : "gyro: Rendering block entities without a client level. (pose: " + pose + ", camera: " + camera + ", state: " + state + ", storage: " + storage + ", renderer: " + this + ')';
+        assert level != null : "gyro: Rendering block entities without a client level. (pose: " + pose + ", state: " + state + ", storage: " + storage + ", renderer: " + this + ')';
         // This is not working properly on:
         // 1. /tick freeze
         // 2. /tick rate 10000

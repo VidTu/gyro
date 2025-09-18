@@ -1,6 +1,5 @@
 > [!WARNING]
-> **The release for the Copper Age drop (alleged to be 1.21.9)
-> and its hotfixes will be the last for the gyro mod.**
+> **The release for the 1.21.9 will be the last for the gyro mod.**
 >
 > This mod has shown various vulnerabilities of the Minecraft waypoint system
 > and worked fine for a "proof-of-concept" type of a mod. These concerns were
