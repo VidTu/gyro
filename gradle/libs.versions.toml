@@ -32,7 +32,7 @@ fabric-api = "0.133.11+1.21.9"
 fabric-loader = "0.17.2"
 jetbrains-annotations = "26.0.2"
 jspecify = "1.0.0"
-minecraft = "1.21.9-pre3"
+minecraft = "1.21.9-pre4"
 
 [plugins]
 architectury-loom = { id = "dev.architectury.loom", version.ref = "architectury-loom" }
