@@ -30,7 +30,7 @@
     }
   ],
   "depends": {
-    "minecraft": "1.21.9-beta.4"
+    "minecraft": "1.21.9-rc.1"
   },
   "recommends": {
     "fabric-resource-loader-v0": "*"
