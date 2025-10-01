@@ -1,5 +1,5 @@
 > [!WARNING]
-> **The release for the 1.21.9 will be the last for the gyro mod.**
+> **The release for the 1.21.9 was the last for the gyro mod.**
 >
 > This mod has shown various vulnerabilities of the Minecraft waypoint system
 > and worked fine for a "proof-of-concept" type of a mod. These concerns were
@@ -8,7 +8,7 @@
 > more sophisticated ways. Use a real hack client if you need the functionality
 > of this mod on any server.
 >
-> *This mod will be archived (and eventually deleted) after the 1.21.9 release.*
+> *This mod has be archived and will be eventually deleted.*
 
 # gyro
 
@@ -24,7 +24,7 @@ This mod has _no required dependencies_, besides the loader and the game.
 You'll need:
 
 - Fabric Loader
-- Minecraft (1.21.8)
+- Minecraft (1.21.9)
 - Optional: Fabric API ("Fabric Resource Loader" module)
 
 Fabric API is **NOT** required, but you can install it for localization support.
@@ -80,7 +80,7 @@ You'll need a GitHub account to download these.
 **A**: Fabric is supported. Quilt should work too.
 
 **Q**: Which Minecraft versions are supported?  
-**A**: Minecraft 1.21.8.
+**A**: Minecraft 1.21.9.
 
 **Q**: Do I need to install Fabric API or Quilt Standard Libraries?  
 **A**: No, but you can install these for other mods and/or localization support.
