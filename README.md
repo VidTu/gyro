@@ -1,4 +1,4 @@
-> [!WARNING]
+> [!CAUTION]
 > **The release for the 1.21.9 was the last for the gyro mod.**
 >
 > This mod has shown various vulnerabilities of the Minecraft waypoint system
@@ -8,7 +8,7 @@
 > more sophisticated ways. Use a real hack client if you need the functionality
 > of this mod on any server.
 >
-> *This mod has be archived and will be eventually deleted.*
+> *This mod has been archived and will be eventually deleted.*
 
 # gyro
 
